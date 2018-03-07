@@ -1,8 +1,12 @@
 package artnet
 
-import "config"
+import (
+	"config"
+	"dmx"
+)
 
 type ArtNet struct {
+	dmx.DMXBuffer
 }
 
 func NewService(*config.Config) (*ArtNet, error) {

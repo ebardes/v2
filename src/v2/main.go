@@ -2,11 +2,11 @@ package main
 
 import (
 	"config"
+	"dmx/artnet"
+	"dmx/sacn"
 	"fmt"
 	"log"
-	"net/artnet"
 	"net/http"
-	"net/sacn"
 	"text/template"
 )
 

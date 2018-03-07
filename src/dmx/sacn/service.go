@@ -2,6 +2,7 @@ package sacn
 
 import (
 	"config"
+	"dmx"
 	"encoding/hex"
 	"fmt"
 	"log"
@@ -15,6 +16,7 @@ const (
 
 // SACN implements a NetDMX Listener
 type SACN struct {
+	dmx.DMXBuffer
 	socket *net.UDPConn
 	cfg    *config.Config
 }
@@ -66,7 +68,7 @@ func (x *SACN) Run() {
 			continue
 		}
 		if x.cfg.DebugLevel > 1 {
-			fmt.Println(hex.Dump(b[0x7d:n]))
+			fmt.Println(hex.Dump(b[0x7e:n]))
 		}
 	}
 	x.socket.Close()
