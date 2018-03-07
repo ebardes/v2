@@ -7,13 +7,18 @@ import (
 	"path"
 )
 
-// Pane ... Describes a pane which is a single display
+const (
+	// DefaultName is the name of the configuration file on the server
+	DefaultName = ".v2cfg.json"
+)
+
+// Pane Describes a pane which is a single display
 type Pane struct {
 	ID           string `json:"id"`
 	StartAddress int    `json:"dmx_start"`
 }
 
-// Config ... The system configuration
+// Config The system configuration
 type Config struct {
 	DebugLevel int    `json:"debuglevel"`
 	Universe   int    `json:"universe"`
@@ -23,7 +28,7 @@ type Config struct {
 	Panes      []Pane `json:"panes"`
 }
 
-// Save ... Saves the config files in a default location
+// Save Saves the config files in a default location
 func (c *Config) Save() error {
 	f, err := os.Create(getLocation())
 	if err != nil {
@@ -37,7 +42,7 @@ func (c *Config) Save() error {
 	return nil
 }
 
-// Load ... Reads the config file from the default location
+// Load Reads the config file from the default location
 func Load(cfg *Config) error {
 	f, err := os.Open(getLocation())
 	if err != nil {
@@ -52,5 +57,5 @@ func Load(cfg *Config) error {
 
 func getLocation() string {
 	u, _ := user.Current()
-	return path.Join(u.HomeDir, ".v2cfg.json")
+	return path.Join(u.HomeDir, DefaultName)
 }
