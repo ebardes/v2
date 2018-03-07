@@ -2,20 +2,17 @@ package main
 
 import (
 	"config"
+	"dmx"
 	"dmx/artnet"
 	"dmx/sacn"
 	"fmt"
 	"log"
 	"net/http"
+	"personality"
 	"text/template"
 )
 
 var cfg config.Config
-
-type NetDMX interface {
-	Run()
-	Stop()
-}
 
 func handleConfig(w http.ResponseWriter, r *http.Request) {
 	t := template.Must(template.ParseFiles("view/config.html"))
@@ -35,7 +32,7 @@ func main() {
 		log.Fatal(err)
 	}
 	// log.Println(cfg)
-	var x NetDMX
+	var x dmx.NetDMX
 
 	switch cfg.Protocol {
 	default:
@@ -55,6 +52,11 @@ func main() {
 		}
 	}
 	cfg.Save()
+
+	for _, pane := range cfg.Panes {
+		p := personality.NewPersonality(pane)
+		x.AddPersonality(&p)
+	}
 
 	go x.Run()
 

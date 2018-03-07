@@ -16,6 +16,7 @@ const (
 type Pane struct {
 	ID           string `json:"id"`
 	StartAddress int    `json:"dmx_start"`
+	Personality  string `json:"personality"`
 }
 
 // Config The system configuration

@@ -6,7 +6,7 @@ import (
 )
 
 type ArtNet struct {
-	dmx.DMXBuffer
+	dmx.Common
 }
 
 func NewService(*config.Config) (*ArtNet, error) {

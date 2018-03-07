@@ -3,7 +3,6 @@ package sacn
 import (
 	"config"
 	"dmx"
-	"encoding/hex"
 	"fmt"
 	"log"
 	"net"
@@ -16,14 +15,14 @@ const (
 
 // SACN implements a NetDMX Listener
 type SACN struct {
-	dmx.DMXBuffer
+	dmx.Common
 	socket *net.UDPConn
-	cfg    *config.Config
 }
 
 // NewService creates a new instance
 func NewService(c *config.Config) (*SACN, error) {
-	x := SACN{cfg: c}
+	x := SACN{}
+	x.Cfg = c
 	univHigh := c.Universe >> 8
 	univLow := c.Universe & 255
 	network := fmt.Sprintf(srvAddrTemplate, univHigh, univLow)
@@ -67,9 +66,8 @@ func (x *SACN) Run() {
 		if b[0x7d] > 0 {
 			continue
 		}
-		if x.cfg.DebugLevel > 1 {
-			fmt.Println(hex.Dump(b[0x7e:n]))
-		}
+
+		x.OnFrame(b[0x7e:n])
 	}
 	x.socket.Close()
 }
