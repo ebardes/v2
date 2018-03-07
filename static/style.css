@@ -1,0 +1,26 @@
+body {
+	margin: 0;
+	background: hsl(0, 0%, 20%);
+	color: hsl(0, 0%, 75%);
+}
+
+.interactive {
+	margin: 15px;
+}
+
+h1 {
+	padding: 5px;
+	border: 1px solid hsl(0, 0%, 40%);
+	border-radius: 3px;
+	font-family: sans-serif;
+}
+
+a:visited {
+	color: white;
+	text-decoration: none;
+}
+
+a {
+	color: white;
+	text-decoration: none;
+}

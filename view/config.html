@@ -1,0 +1,20 @@
+<html>
+<head>
+	<link rel="stylesheet" href="../style.css" type="text/css" />
+	<script type="text/javascript" src="../jquery-3.2.1.min.js"></script>
+	<script type="text/javascript" src="../main.js"></script>
+</head>
+<body>
+	<div class="interactive">
+		<h1>Network</h1>
+		<div>Universe: <b>{{.Universe}}</b></div>
+	</div>
+
+	<div class="interactive">
+		{{- range $a := .Panes -}}
+		<h1>Pane {{.ID}}</h1>
+		<div>Starting Address: <b>{{.StartAddress}}</b></div>
+		{{- end -}}
+	</div>
+</body>
+</html>
