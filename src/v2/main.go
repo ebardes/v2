@@ -6,6 +6,7 @@ import (
 	"dmx/artnet"
 	"dmx/sacn"
 	"fmt"
+	"gui"
 	"log"
 	"net/http"
 	"personality"
@@ -13,6 +14,7 @@ import (
 )
 
 var cfg config.Config
+var DMX dmx.NetDMX
 
 func handleConfig(w http.ResponseWriter, r *http.Request) {
 	t := template.Must(template.ParseFiles("view/config.html"))
@@ -32,21 +34,19 @@ func main() {
 		log.Fatal(err)
 	}
 	// log.Println(cfg)
-	var x dmx.NetDMX
-
 	switch cfg.Protocol {
 	default:
 		cfg.Protocol = "sacn"
 		fallthrough
 
 	case "sacn":
-		x, err = sacn.NewService(&cfg)
+		DMX, err = sacn.NewService(&cfg)
 		if err != nil {
 			log.Fatal(err)
 		}
 
 	case "artnet":
-		x, err = artnet.NewService(&cfg)
+		DMX, err = artnet.NewService(&cfg)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -55,15 +55,20 @@ func main() {
 
 	for _, pane := range cfg.Panes {
 		p := personality.NewPersonality(pane)
-		x.AddPersonality(&p)
+		DMX.AddPersonality(&p)
 	}
 
-	go x.Run()
+	go DMX.Run()
 
-	http.HandleFunc("/app/", handler)
-	http.HandleFunc("/view/config.html", handleConfig)
-	http.Handle("/", http.FileServer(http.Dir("static")))
+	go func() {
+		http.HandleFunc("/app/", handler)
+		http.HandleFunc("/view/config.html", handleConfig)
+		http.Handle("/", http.FileServer(http.Dir("static")))
 
-	log.Printf("Listening... port %d", cfg.WebPort)
-	http.ListenAndServe(fmt.Sprintf(":%d", cfg.WebPort), nil)
+		log.Printf("Listening... port %d", cfg.WebPort)
+		http.ListenAndServe(fmt.Sprintf(":%d", cfg.WebPort), nil)
+	}()
+
+	g := gui.Open("V2", make(chan []byte))
+	g.Run()
 }
