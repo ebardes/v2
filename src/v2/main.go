@@ -1,20 +1,23 @@
 package main
 
 import (
-	"config"
-	"dmx"
-	"dmx/artnet"
-	"dmx/sacn"
 	"fmt"
-	"gui"
 	"log"
 	"net/http"
-	"personality"
 	"text/template"
+	"v2/config"
+	"v2/dmx"
+	"v2/dmx/artnet"
+	"v2/dmx/sacn"
+	"v2/personality"
 )
 
 var cfg config.Config
+
+// DMX is the current DMX receiver
 var DMX dmx.NetDMX
+
+var done chan bool
 
 func handleConfig(w http.ResponseWriter, r *http.Request) {
 	t := template.Must(template.ParseFiles("view/config.html"))
@@ -60,15 +63,17 @@ func main() {
 
 	go DMX.Run()
 
-	go func() {
-		http.HandleFunc("/app/", handler)
-		http.HandleFunc("/view/config.html", handleConfig)
-		http.Handle("/", http.FileServer(http.Dir("static")))
+	// go func() {
+	http.HandleFunc("/app/", handler)
+	http.HandleFunc("/view/config.html", handleConfig)
+	http.Handle("/", http.FileServer(http.Dir("static")))
 
-		log.Printf("Listening... port %d", cfg.WebPort)
-		http.ListenAndServe(fmt.Sprintf(":%d", cfg.WebPort), nil)
-	}()
+	log.Printf("Listening... port %d", cfg.WebPort)
+	http.ListenAndServe(fmt.Sprintf(":%d", cfg.WebPort), nil)
+	// }()
+	//
+	// g := gui.Open("V2", make(chan []byte))
+	// g.Run()
 
-	g := gui.Open("V2", make(chan []byte))
-	g.Run()
+	<-done
 }

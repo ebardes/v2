@@ -1,10 +1,10 @@
 package dmx
 
 import (
-	"config"
 	"encoding/hex"
 	"fmt"
-	"personality"
+	"v2/config"
+	"v2/personality"
 )
 
 // NetDMX is the base interface for DMX

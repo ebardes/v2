@@ -1,8 +1,8 @@
 package artnet
 
 import (
-	"config"
-	"dmx"
+	"v2/config"
+	"v2/dmx"
 )
 
 type ArtNet struct {

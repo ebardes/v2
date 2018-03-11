@@ -1,6 +1,6 @@
 package personality
 
-import "config"
+import "v2/config"
 
 type Personality interface {
 	Decode([]byte) int

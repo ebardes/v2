@@ -1,11 +1,11 @@
 package sacn
 
 import (
-	"config"
-	"dmx"
 	"fmt"
 	"log"
 	"net"
+	"v2/config"
+	"v2/dmx"
 )
 
 const (
