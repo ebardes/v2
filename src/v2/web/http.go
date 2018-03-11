@@ -21,6 +21,9 @@ func Register(pattern string, fn FN) {
 }
 
 func Run(cfg config.Config) {
+
+	http.Handle("/", http.FileServer(http.Dir("static")))
+
 	addr := fmt.Sprintf(":%d", cfg.WebPort)
 	log.Println("Listening to " + addr)
 	log.Fatal(http.ListenAndServe(addr, nil))

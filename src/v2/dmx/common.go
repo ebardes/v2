@@ -45,7 +45,9 @@ func (me *Common) OnFrame(b []byte) {
 
 		if me.Bindings != nil {
 			for _, pers := range me.Bindings {
-				pers.Decode(b)
+				if pers != nil {
+					pers.Decode(b)
+				}
 			}
 		}
 	}

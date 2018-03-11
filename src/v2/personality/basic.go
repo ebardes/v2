@@ -23,14 +23,19 @@ type MediumPersonality struct {
 	ysize int16
 }
 
-func NewPersonality(c config.Pane) Personality {
+func NewPersonality(c config.Pane) (bp Personality) {
 	switch c.Personality {
 	default:
 	case "basic":
-		bp := BasicPersonality{start: c.StartAddress}
-		return &bp
+		bp = &BasicPersonality{start: c.StartAddress}
+
+	case "medium":
+		mp := MediumPersonality{}
+		mp.start = c.StartAddress
+		bp = &mp
 	}
-	return nil
+
+	return
 }
 
 func (me *BasicPersonality) Decode(b []byte) int {
@@ -61,7 +66,7 @@ func ss(low byte, high byte) int16 {
 	return int16(uint16(high)<<8 | uint16(low))
 }
 
-func (me *MediumPersonality) Decode(b []byte) {
+func (me *MediumPersonality) Decode(b []byte) int {
 	i := me.BasicPersonality.Decode(b)
 	me.x = ss(b[i], b[i+1])
 	i += 2
@@ -71,6 +76,8 @@ func (me *MediumPersonality) Decode(b []byte) {
 	i += 2
 	me.ysize = ss(b[i], b[i+1])
 	i += 2
+
+	return i
 }
 
 func (me *MediumPersonality) Size() int {

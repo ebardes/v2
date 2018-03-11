@@ -38,6 +38,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	// log.Println(cfg)
 	switch cfg.Protocol {
 	default:
@@ -67,7 +68,6 @@ func main() {
 
 	webserver.Register("/index.html", view.Index)
 	webserver.Register("/config.html", view.Config)
-	go webserver.Run(cfg)
-
-	<-done
+	webserver.Register("/display/", view.Display)
+	webserver.Run(cfg)
 }

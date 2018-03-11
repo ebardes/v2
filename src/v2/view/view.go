@@ -46,3 +46,8 @@ func (me *View) Title(title string) *View {
 	me.info.Title = title
 	return me
 }
+
+func (me *View) Prefix(prefix string) *View {
+	me.info.Prefix = prefix
+	return me
+}
