@@ -5,6 +5,7 @@ import "v2/config"
 type Personality interface {
 	Decode([]byte) int
 	Size() int
+	Start() int
 }
 
 type BasicPersonality struct {
@@ -23,15 +24,15 @@ type MediumPersonality struct {
 	ysize int16
 }
 
-func NewPersonality(c config.Pane) (bp Personality) {
+func NewPersonality(c config.Layer) (bp Personality) {
 	switch c.Personality {
 	default:
 	case "basic":
-		bp = &BasicPersonality{start: c.StartAddress}
+		bp = &BasicPersonality{start: int(c.StartAddress)}
 
 	case "medium":
 		mp := MediumPersonality{}
-		mp.start = c.StartAddress
+		mp.start = int(c.StartAddress)
 		bp = &mp
 	}
 
@@ -59,6 +60,10 @@ func (*BasicPersonality) Size() int {
 	return 4
 }
 
+func (me *BasicPersonality) Start() int {
+	return me.start
+}
+
 func us(low byte, high byte) uint16 {
 	return uint16(high)<<8 | uint16(low)
 }
@@ -82,4 +87,7 @@ func (me *MediumPersonality) Decode(b []byte) int {
 
 func (me *MediumPersonality) Size() int {
 	return me.BasicPersonality.Size() + 8
+}
+func (me *MediumPersonality) Start() int {
+	return me.start
 }

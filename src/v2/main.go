@@ -1,10 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
-	"text/template"
 	"v2/config"
 	"v2/dmx"
 	"v2/dmx/artnet"
@@ -14,26 +11,14 @@ import (
 	"v2/web"
 )
 
-var cfg config.Config
-
 // DMX is the current DMX receiver
 var DMX dmx.NetDMX
 
 var done chan bool
 
-func handleConfig(w http.ResponseWriter, r *http.Request) {
-	t := template.Must(template.ParseFiles("view/config.html"))
-	x := t.Execute(w, cfg) // merge.
-	if x != nil {
-		log.Println(x)
-	}
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-}
-
 func main() {
+	var cfg config.Config
+
 	err := config.Load(&cfg)
 	if err != nil {
 		log.Fatal(err)
@@ -57,11 +42,29 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+
+	if len(cfg.Displays) <= 0 {
+		p := config.Display{
+			ID: 1,
+			Layers: []config.Layer{
+				config.Layer{
+					Personality:  "basic",
+					StartAddress: 1,
+				},
+			},
+		}
+		cfg.Displays = append(cfg.Displays, p)
+	}
+
 	cfg.Save()
 
-	for _, pane := range cfg.Panes {
-		p := personality.NewPersonality(pane)
-		DMX.AddPersonality(&p)
+	for _, display := range cfg.Displays {
+		d := view.AddDisplay(display)
+		for _, layer := range display.Layers {
+			p := personality.NewPersonality(layer)
+			DMX.AddPersonality(&p)
+			d.AddLayer(p)
+		}
 	}
 
 	go DMX.Run()

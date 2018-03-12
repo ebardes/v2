@@ -12,21 +12,31 @@ const (
 	DefaultName = ".v2cfg.json"
 )
 
-// Pane Describes a pane which is a single display
-type Pane struct {
-	ID           string `json:"id"`
-	StartAddress int    `json:"dmx_start"`
+type Layer struct {
+	StartAddress uint   `json:"dmx_start"`
 	Personality  string `json:"personality"`
+}
+
+// Pane Describes a pane which is a single display
+type Display struct {
+	ID     uint    `json:"id"`
+	Layers []Layer `json:"layers"`
 }
 
 // Config The system configuration
 type Config struct {
-	DebugLevel int    `json:"debuglevel"`
-	Universe   int    `json:"universe"`
-	WebPort    int    `json:"port"`
-	Interface  string `json:"interface"`
-	Protocol   string `json:"protocol"`
-	Panes      []Pane `json:"panes"`
+	DebugLevel int       `json:"debuglevel"`
+	Universe   uint      `json:"universe"`
+	WebPort    uint      `json:"port"`
+	Interface  string    `json:"interface"`
+	Protocol   string    `json:"protocol"`
+	Displays   []Display `json:"display"`
+}
+
+var cfg Config
+
+func Get() *Config {
+	return &cfg
 }
 
 // Save Saves the config files in a default location
