@@ -37,7 +37,10 @@ func changed(a []byte, b []byte) bool {
 // OnFrame is the main event listener for when DMX packets arrive
 func (me *Common) OnFrame(b []byte) {
 	if changed(b, me.Frame) {
-		me.Frame = b
+		if len(me.Frame) != len(b) {
+			me.Frame = make([]byte, len(b))
+		}
+		copy(me.Frame, b)
 
 		if me.Cfg.DebugLevel > 1 {
 			fmt.Println(hex.Dump(b))
