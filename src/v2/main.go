@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"v2/config"
+	"v2/content"
 	"v2/dmx"
 	"v2/dmx/artnet"
 	"v2/dmx/sacn"
@@ -43,7 +44,7 @@ func main() {
 		}
 	}
 
-	if len(cfg.Displays) <= 0 {
+	if cfg.Displays == nil || len(cfg.Displays) <= 0 {
 		p := config.Display{
 			ID: 1,
 			Layers: []config.Layer{
@@ -54,6 +55,20 @@ func main() {
 			},
 		}
 		cfg.Displays = append(cfg.Displays, p)
+	}
+
+	if cfg.Content == nil || len(cfg.Content) <= 0 {
+		cfg.Content = map[int]content.Group{
+			1: content.Group{
+				Slots: map[int]content.Slot{
+					1: content.Slot{
+						Name: "Test Pattern",
+						Type: "image",
+						URL:  "static/TestBars.png",
+					},
+				},
+			},
+		}
 	}
 
 	cfg.Save()

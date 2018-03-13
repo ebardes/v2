@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"v2/content"
 )
 
 const (
@@ -25,12 +26,13 @@ type Display struct {
 
 // Config The system configuration
 type Config struct {
-	DebugLevel int       `json:"debuglevel"`
-	Universe   uint      `json:"universe"`
-	WebPort    uint      `json:"port"`
-	Interface  string    `json:"interface"`
-	Protocol   string    `json:"protocol"`
-	Displays   []Display `json:"display"`
+	DebugLevel int                   `json:"debuglevel"`
+	Universe   uint                  `json:"universe"`
+	WebPort    uint                  `json:"port"`
+	Interface  string                `json:"interface"`
+	Protocol   string                `json:"protocol"`
+	Displays   []Display             `json:"display"`
+	Content    map[int]content.Group `json:"groups"`
 }
 
 var cfg Config

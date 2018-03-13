@@ -35,15 +35,16 @@ func changed(a []byte, b []byte) bool {
 }
 
 // OnFrame is the main event listener for when DMX packets arrive
-func (me *Common) OnFrame(b []byte) {
+func (me *Common) OnFrame(universe int, b []byte) {
 	if changed(b, me.Frame) {
 		if len(me.Frame) != len(b) {
 			me.Frame = make([]byte, len(b))
 		}
 		copy(me.Frame, b)
 
-		if me.Cfg.DebugLevel > 1 {
-			fmt.Println(hex.Dump(b))
+		if me.Cfg != nil && me.Cfg.DebugLevel > 1 {
+			fmt.Printf("Universe: %d\n", universe)
+			fmt.Print(hex.Dump(b))
 		}
 
 		if me.Bindings != nil {
