@@ -3,8 +3,8 @@ package view
 import (
 	"html/template"
 	"io"
-	"log"
 	"os"
+	"path/filepath"
 )
 
 type View struct {
@@ -24,12 +24,15 @@ var AllTemplates *template.Template
 func init() {
 	gopath := os.Getenv("GOPATH")
 
-	g, err := template.ParseGlob(gopath + "/view/*.tpl")
-	if err != nil {
-		log.Panic(err)
-	}
+	list := filepath.SplitList(gopath)
 
-	AllTemplates = g
+	for _, p := range list {
+		g, err := template.ParseGlob(p + "/view/*.tpl")
+		if err == nil {
+			// log.Panic(err)
+			AllTemplates = g
+		}
+	}
 }
 
 func InitView(writer io.Writer) *View {

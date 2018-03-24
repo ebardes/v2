@@ -21,8 +21,15 @@ func Register(pattern string, fn FN) {
 }
 
 func Run(cfg config.Config) {
-
-	http.Handle("/", http.FileServer(http.Dir("static")))
+	x := http.FileServer(http.Dir("static"))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/" {
+			w.Header().Add("Location", "index.go")
+			w.WriteHeader(http.StatusTemporaryRedirect)
+		} else {
+			x.ServeHTTP(w, r)
+		}
+	})
 
 	addr := fmt.Sprintf(":%d", cfg.WebPort)
 	log.Println("Listening to " + addr)

@@ -14,7 +14,7 @@ const (
 )
 
 type Layer struct {
-	StartAddress uint   `json:"dmx_start"`
+	StartAddress int    `json:"dmx_start"`
 	Personality  string `json:"personality"`
 }
 
@@ -43,15 +43,23 @@ func Get() *Config {
 
 // Save Saves the config files in a default location
 func (c *Config) Save() error {
-	f, err := os.Create(getLocation())
+	temp := getLocation() + ".tmp"
+
+	f, err := os.Create(temp)
 	if err != nil {
-		return nil
+		return err
 	}
 	defer f.Close()
 
 	e := json.NewEncoder(f)
 	e.SetIndent("", " ")
-	e.Encode(c)
+	err = e.Encode(c)
+	if err != nil {
+		return err
+	}
+	f.Close()
+
+	os.Rename(temp, getLocation())
 	return nil
 }
 

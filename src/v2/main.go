@@ -73,19 +73,21 @@ func main() {
 
 	cfg.Save()
 
+	// Construct the runtime layers
 	for _, display := range cfg.Displays {
 		d := view.AddDisplay(display)
 		for _, layer := range display.Layers {
 			p := personality.NewPersonality(layer)
 			DMX.AddPersonality(&p)
-			d.AddLayer(p)
+			d.AddLayer(layer.StartAddress, p)
 		}
 	}
 
 	go DMX.Run()
 
-	webserver.Register("/index.html", view.Index)
-	webserver.Register("/config.html", view.Config)
+	webserver.Register("/index.go", view.Index)
+	webserver.Register("/config.go", view.Config)
 	webserver.Register("/display/", view.Display)
+	webserver.Register("/ws/", webserver.WS)
 	webserver.Run(cfg)
 }
