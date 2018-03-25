@@ -1,8 +1,6 @@
 package sacn
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 	"log"
 	"net"
@@ -57,7 +55,8 @@ type DMPLayer struct {
 // SACN implements a NetDMX Listener
 type SACN struct {
 	dmx.Common
-	socket *net.UDPConn
+	socket   *net.UDPConn
+	Universe int
 }
 
 // NewService creates a new instance
@@ -103,19 +102,12 @@ func (x *SACN) Run() {
 			continue
 		}
 
-		var d E131Packet
-		decode(b, &d)
-
 		// ETC Visualization Mode filter
 		if b[0x7d] > 0 {
 			continue
 		}
 
-		if x.Cfg.DebugLevel > 4 {
-			log.Printf("Packet from %v\n", addr)
-		}
-
-		x.OnFrame(int(d.Universe), d.Data)
+		x.OnFrame(addr, x.Universe, b[0x7e:n])
 	}
 	x.socket.Close()
 }
@@ -123,9 +115,4 @@ func (x *SACN) Run() {
 // Stop ends the running thread
 func (x *SACN) Stop() {
 	x.socket.Close()
-}
-
-// decode streams binary data into structures
-func decode(b []byte, data interface{}) error {
-	return binary.Read(bytes.NewBuffer(b), binary.LittleEndian, data)
 }

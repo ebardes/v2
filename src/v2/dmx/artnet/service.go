@@ -184,7 +184,7 @@ func (x *ArtNet) Run() {
 				continue
 			}
 
-			x.OnFrame(int(d.Net), d.Data[:])
+			x.OnFrame(addr, int(d.Net), d.Data[:])
 		case OpPoll:
 			x.Poll(b)
 

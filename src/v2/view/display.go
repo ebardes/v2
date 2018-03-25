@@ -1,6 +1,8 @@
 package view
 
 import (
+	"bytes"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -76,6 +78,17 @@ func (me *DisplayInfo) Send(msg personality.Message) error {
 	return me.Conn.WriteMessage(websocket.TextMessage, data)
 }
 
-func (me *DisplayInfo) AddLayer(start int, p personality.Personality) {
-	me.Layers[start] = DisplayLayer{P: p, Chan: make(chan bool, 25)}
+func (me *DisplayInfo) AddLayer(start int, p personality.Personality) *DisplayLayer {
+	dl := DisplayLayer{P: p, Chan: make(chan bool, 25)}
+	me.Layers[start] = dl
+	return &dl
+}
+
+func (me *DisplayLayer) OnFrame(b []byte) {
+	err := binary.Read(bytes.NewReader(b), binary.LittleEndian, &me.P)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	log.Println(json.Marshal(me.P))
 }

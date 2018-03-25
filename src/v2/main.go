@@ -75,11 +75,11 @@ func main() {
 
 	// Construct the runtime layers
 	for _, display := range cfg.Displays {
-		d := view.AddDisplay(display)
+		di := view.AddDisplay(display)
 		for _, layer := range display.Layers {
 			p := personality.NewPersonality(layer)
-			DMX.AddPersonality(&p)
-			d.AddLayer(layer.StartAddress, p)
+			dl := di.AddLayer(layer.StartAddress, p)
+			DMX.AddLayer(layer.StartAddress, dl)
 		}
 	}
 
