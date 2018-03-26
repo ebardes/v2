@@ -1,13 +1,12 @@
 package personality
 
-import (
-	"v2/config"
-)
-
+// Personality is the base interface for all personalities.
 type Personality interface {
 	Decode([]byte) int
 }
 
+// BasicPersonality is the core media server functionality.  It's a nice
+// compact four channel personality.
 type BasicPersonality struct {
 	start  int
 	level  byte
@@ -16,6 +15,7 @@ type BasicPersonality struct {
 	volume byte
 }
 
+// MediumPersonality extends the BasePersonality with scaling and pan functions.
 type MediumPersonality struct {
 	BasicPersonality
 	x     int16
@@ -24,8 +24,9 @@ type MediumPersonality struct {
 	ysize int16
 }
 
-func NewPersonality(c config.Layer) (bp Personality) {
-	switch c.Personality {
+// NewPersonality instantiates the appropriate fixture definitions
+func NewPersonality(personalityName string) (bp Personality) {
+	switch personalityName {
 	default:
 	case "basic":
 		bp = &BasicPersonality{}
@@ -37,6 +38,7 @@ func NewPersonality(c config.Layer) (bp Personality) {
 	return
 }
 
+// Decode reads the DMX packet and sets parameters accordingly
 func (me *BasicPersonality) Decode(b []byte) (i int) {
 	if len(b)-me.Size() < me.start {
 		return 0
@@ -54,6 +56,7 @@ func (me *BasicPersonality) Decode(b []byte) (i int) {
 	return
 }
 
+// Size returns the number of bytes required
 func (*BasicPersonality) Size() int {
 	return 4
 }
@@ -65,6 +68,7 @@ func ss(low byte, high byte) int16 {
 	return int16(uint16(high)<<8 | uint16(low))
 }
 
+// Decode the medium frame which extends from the Base Decode.
 func (me *MediumPersonality) Decode(b []byte) (i int) {
 	i = me.BasicPersonality.Decode(b)
 	me.x = ss(b[i], b[i+1])
@@ -78,6 +82,7 @@ func (me *MediumPersonality) Decode(b []byte) (i int) {
 	return
 }
 
+// Size returns the number of bytes required
 func (me *MediumPersonality) Size() int {
 	return me.BasicPersonality.Size() + 8
 }

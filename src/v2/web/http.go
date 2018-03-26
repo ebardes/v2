@@ -7,8 +7,10 @@ import (
 	"v2/config"
 )
 
+// FN is a generic handler type
 type FN func(http.ResponseWriter, *http.Request) error
 
+// Register connections an HTTP path to a Function
 func Register(pattern string, fn FN) {
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
 		err := fn(w, r)
@@ -20,16 +22,9 @@ func Register(pattern string, fn FN) {
 	})
 }
 
+// Run launches the webserver and runs "forever"
 func Run(cfg config.Config) {
-	x := http.FileServer(http.Dir("static"))
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/" {
-			w.Header().Add("Location", "index.go")
-			w.WriteHeader(http.StatusTemporaryRedirect)
-		} else {
-			x.ServeHTTP(w, r)
-		}
-	})
+	http.Handle("/", http.FileServer(http.Dir("static")))
 
 	addr := fmt.Sprintf(":%d", cfg.WebPort)
 	log.Println("Listening to " + addr)

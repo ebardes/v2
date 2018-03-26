@@ -7,8 +7,12 @@
   <script type="text/javascript">var panel={{.Data.Panel}};</script>
 </head>
 <body>
-  {{ range $i,$v :=  .Data.Layers }}
-  <div id="layer_{{$i}}">{{$v}}</div>
-  {{ end }}
+  <form>
+    <table>
+      <tr>
+        <td>Universe</td><td><input name="universe" type="number" /></td>
+      </tr>
+    </table>
+  </form>
 </body>
 </html>

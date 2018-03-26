@@ -1,6 +1,8 @@
 var ws
 
-$(document).ready(function() {
+$(document).ready()
+
+function openSocket() {
   var dest = "ws://" + location.host + "/ws/"
   console.log(document.URL)
   console.log(dest)
@@ -31,7 +33,7 @@ $(document).ready(function() {
   ws.onerror = function(evt) {
     console.log("ERROR: " + evt.data);
   }
-})
+}
 
 function ackFunction(e) {
   console.log(e)
