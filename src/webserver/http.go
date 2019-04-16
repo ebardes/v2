@@ -8,12 +8,14 @@ import (
 )
 
 // FN is a generic handler type
-type FN func(http.ResponseWriter, *http.Request) error
+type FN func(http.ResponseWriter, *http.Request, *config.Config) error
+
+var cfg *config.Config
 
 // Register connections an HTTP path to a Function
 func Register(pattern string, fn FN) {
 	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		err := fn(w, r)
+		err := fn(w, r, cfg)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(500)
@@ -23,8 +25,9 @@ func Register(pattern string, fn FN) {
 }
 
 // Run launches the webserver and runs "forever"
-func Run(cfg config.Config) {
-	http.Handle("/", http.FileServer(http.Dir("static")))
+func Run(config *config.Config) {
+	cfg = config
+	http.Handle("/", http.FileServer(http.Dir(cfg.Static)))
 
 	addr := fmt.Sprintf(":%d", cfg.WebPort)
 	log.Println("Listening to " + addr)

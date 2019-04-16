@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"v2/config"
 	"v2/personality"
 	"v2/view"
 
@@ -16,7 +17,7 @@ var upgrader = websocket.Upgrader{
 }
 
 // WS is the Websocket entrypoint from the browser
-func WS(w http.ResponseWriter, r *http.Request) error {
+func WS(w http.ResponseWriter, r *http.Request, cfg *config.Config) error {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)

@@ -18,7 +18,7 @@ type Layer struct {
 	Personality  string `json:"personality"`
 }
 
-// Pane Describes a pane which is a single display
+// Display Describes a pane which is a single display
 type Display struct {
 	ID     uint    `json:"id"`
 	Layers []Layer `json:"layers"`
@@ -26,19 +26,15 @@ type Display struct {
 
 // Config The system configuration
 type Config struct {
-	DebugLevel int                   `json:"debuglevel"`
-	Universe   uint                  `json:"universe"`
-	WebPort    uint                  `json:"port"`
-	Interface  string                `json:"interface"`
-	Protocol   string                `json:"protocol"`
-	Displays   []Display             `json:"display"`
-	Content    map[int]content.Group `json:"groups"`
-}
-
-var cfg Config
-
-func Get() *Config {
-	return &cfg
+	DebugLevel  int                   `json:"debuglevel"`
+	Universe    uint                  `json:"universe"`
+	WebPort     uint                  `json:"port"`
+	Interface   string                `json:"interface"`
+	Protocol    string                `json:"protocol"`
+	Displays    []Display             `json:"display"`
+	Content     map[int]content.Group `json:"groups"`
+	TemplateDir string                `json:"-"`
+	Static      string                `json:"-"`
 }
 
 // Save Saves the config files in a default location
@@ -64,7 +60,7 @@ func (c *Config) Save() error {
 }
 
 // Load Reads the config file from the default location
-func Load(cfg *Config) error {
+func Load(cfg *Config) (err error) {
 	f, err := os.Open(getLocation())
 	if err != nil {
 		return err
@@ -72,8 +68,7 @@ func Load(cfg *Config) error {
 	defer f.Close()
 
 	d := json.NewDecoder(f)
-	d.Decode(cfg)
-	return nil
+	return d.Decode(cfg)
 }
 
 func getLocation() string {

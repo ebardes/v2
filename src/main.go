@@ -1,26 +1,49 @@
 package main
 
 import (
-	"log"
+	"os"
 	"v2/config"
 	"v2/dmx"
 	"v2/view"
-	"v2/web"
+	"v2/webserver"
+
+	flags "github.com/jessevdk/go-flags"
+	"github.com/mattn/go-isatty"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
+
+type options struct {
+	TemplateDir string `short:"t" long:"template" description:"Location of template directory" default:"view"`
+	Static      string `short:"s" long:"static" description:"Location of static content directory" default:"static"`
+}
 
 // DMX is the current DMX receiver
 var DMX dmx.NetDMX
-
-var done chan bool
+var opts options
 
 func main() {
+	tty := isatty.IsTerminal(os.Stderr.Fd())
+	if tty {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	}
+
+	_, err := flags.Parse(&opts)
+	if err != nil {
+		log.Error().Err(err).Msg("Parse error")
+		os.Exit(1)
+	}
 
 	var cfg config.Config
+	cfg.TemplateDir = opts.TemplateDir
+	cfg.Static = opts.Static
 
-	err := config.Load(&cfg)
+	err = config.Load(&cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Error().Err(err).Msg("Unable to load config file")
+		return
 	}
+
 	/*
 		// log.Println(cfg)
 		switch cfg.Protocol {
@@ -82,9 +105,11 @@ func main() {
 
 		go DMX.Run()
 	*/
+
+	view.Init(&cfg)
 	webserver.Register("/index.go", view.Index)
 	webserver.Register("/config.go", view.Config)
 	webserver.Register("/display/", view.Display)
 	webserver.Register("/ws/", webserver.WS)
-	webserver.Run(cfg)
+	webserver.Run(&cfg)
 }

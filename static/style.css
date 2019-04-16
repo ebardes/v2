@@ -2,6 +2,7 @@ body {
 	margin: 0;
 	background: hsl(0, 0%, 20%);
 	color: hsl(0, 0%, 75%);
+	font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
 .interactive {
@@ -11,8 +12,14 @@ body {
 h1 {
 	padding: 5px;
 	border: 1px solid hsl(0, 0%, 40%);
-	border-radius: 3px;
-	font-family: sans-serif;
+	border-radius: 5px;
+}
+
+h2 {
+	padding: 5px;
+	border: 1px solid hsl(0, 0%, 30%);
+	border-radius: 5px;
+	background:  hsl(130, 20%, 20%);
 }
 
 a:visited {
@@ -23,4 +30,32 @@ a:visited {
 a {
 	color: white;
 	text-decoration: none;
+}
+
+.slot {
+	display: table-cell;
+	width: 250px;
+	height: 320px;
+}
+
+.slot .head {
+	border-top-left-radius: 6px;
+	border-top-right-radius: 6px;
+	padding: 1px 10px;
+	background: hsl(0, 0%, 60%);
+}
+
+.slot .body {
+	border-bottom-left-radius: 6px;
+	border-bottom-right-radius: 6px;
+	border: 1px solid hsl(0, 0%, 60%);
+	background: hsl(0, 0%, 20%);
+	min-height: 200px;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.slot .body img {
+	max-height: 220px;
+	max-width: 220px;
 }

@@ -3,8 +3,8 @@ package view
 import (
 	"html/template"
 	"io"
-	"os"
-	"path/filepath"
+	"path"
+	"v2/config"
 )
 
 type View struct {
@@ -21,17 +21,12 @@ type Info struct {
 // AllTemplates is the root template
 var AllTemplates *template.Template
 
-func init() {
-	gopath := os.Getenv("GOPATH")
-
-	list := filepath.SplitList(gopath)
-
-	for _, p := range list {
-		g, err := template.ParseGlob(p + "/view/*.tpl")
-		if err == nil {
-			// log.Panic(err)
-			AllTemplates = g
-		}
+func Init(cfg *config.Config) {
+	p := path.Join(cfg.TemplateDir, "*.tpl")
+	g, err := template.ParseGlob(p)
+	if err == nil {
+		// log.Panic(err)
+		AllTemplates = g
 	}
 }
 

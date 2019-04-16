@@ -31,7 +31,7 @@ func init() {
 	displays = make(map[uint]*DisplayInfo)
 }
 
-func Display(w http.ResponseWriter, r *http.Request) error {
+func Display(w http.ResponseWriter, r *http.Request, cfg *config.Config) error {
 	var n uint
 	path := r.URL.Path
 	i := strings.LastIndex(path, "/")
