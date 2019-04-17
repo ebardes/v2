@@ -5,6 +5,8 @@ import (
 	"io"
 	"path"
 	"v2/config"
+
+	"github.com/rs/zerolog/log"
 )
 
 type View struct {
@@ -25,8 +27,9 @@ func Init(cfg *config.Config) {
 	p := path.Join(cfg.TemplateDir, "*.tpl")
 	g, err := template.ParseGlob(p)
 	if err == nil {
-		// log.Panic(err)
 		AllTemplates = g
+	} else {
+		log.Error().Err(err).Msg("Could not templates")
 	}
 }
 

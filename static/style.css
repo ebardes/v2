@@ -53,6 +53,7 @@ a {
 	min-height: 200px;
 	text-align: center;
 	vertical-align: middle;
+	padding: 3px 2px;
 }
 
 .slot .body img {
