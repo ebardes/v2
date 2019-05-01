@@ -38,7 +38,7 @@ func main() {
 	cfg.TemplateDir = opts.TemplateDir
 	cfg.Static = opts.Static
 
-	err = config.Load(&cfg)
+	err = cfg.Load()
 	if err != nil {
 		log.Error().Err(err).Msg("Unable to load config file")
 		return

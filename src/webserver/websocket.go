@@ -42,7 +42,16 @@ func WS(w http.ResponseWriter, r *http.Request, cfg *config.Config) error {
 
 		switch m.Verb {
 		case personality.VerbRegister:
-			di := view.GetDisplay(m.Display)
+			d, err := cfg.GetDisplay(m.Display)
+			if err != nil {
+				return err
+			}
+
+			di := view.DisplayInfo{}
+			for i := range d.Layers {
+				dl := view.DisplayLayer{}
+				di.Layers[i] = dl
+			}
 			di.SetConnection(conn)
 			m.Verb = personality.VerbAck
 

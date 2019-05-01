@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/user"
 	"path"
@@ -20,7 +21,7 @@ type Layer struct {
 
 // Display Describes a pane which is a single display
 type Display struct {
-	ID     uint    `json:"id"`
+	ID     int     `json:"id"`
 	Layers []Layer `json:"layers"`
 }
 
@@ -60,7 +61,7 @@ func (c *Config) Save() error {
 }
 
 // Load Reads the config file from the default location
-func Load(cfg *Config) (err error) {
+func (c *Config) Load() (err error) {
 	f, err := os.Open(getLocation())
 	if err != nil {
 		return err
@@ -68,10 +69,20 @@ func Load(cfg *Config) (err error) {
 	defer f.Close()
 
 	d := json.NewDecoder(f)
-	return d.Decode(cfg)
+	return d.Decode(c)
 }
 
 func getLocation() string {
 	u, _ := user.Current()
 	return path.Join(u.HomeDir, DefaultName)
+}
+
+func (c *Config) GetDisplay(id int) (d *Display, err error) {
+	id--
+	if id < 0 || id > len(c.Displays) {
+		err = fmt.Errorf("Display ID out of range")
+		return
+	}
+	d = &c.Displays[id]
+	return
 }

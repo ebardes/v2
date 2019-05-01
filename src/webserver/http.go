@@ -27,25 +27,24 @@ func Register(pattern string, fn FN) {
 }
 
 type static struct {
+	FS http.Handler
 }
-
-var fs http.Handler
 
 func (s *static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.RequestURI == "/" {
 		w.Header().Add("Location", "index.go")
 		w.WriteHeader(http.StatusFound)
 	} else {
-		fs.ServeHTTP(w, r)
+		s.FS.ServeHTTP(w, r)
 	}
 }
 
 // Run launches the webserver and runs "forever"
 func Run(config *config.Config) {
 	cfg = config
-	fs = http.FileServer(http.Dir(cfg.Static))
-	s := static{}
-	http.Handle("/", &s)
+	http.Handle("/", &static{
+		http.FileServer(http.Dir(cfg.Static)),
+	})
 
 	enumInterfaces()
 	addr := fmt.Sprintf(":%d", cfg.WebPort)
