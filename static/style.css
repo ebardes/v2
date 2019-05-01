@@ -1,8 +1,21 @@
+@font-face {
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Roboto'), local('Roboto-Regular'), url(Roboto/Roboto-Regular.ttf);
+}
+@font-face {
+	font-family: 'Roboto';
+	font-style: bold;
+	font-weight: 800;
+	src: local('Roboto-Bold'), url(Roboto/Roboto-Bold.ttf);
+}
+
 body {
 	margin: 0;
 	background: hsl(0, 0%, 20%);
 	color: hsl(0, 0%, 75%);
-	font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+	font-family: 'Roboto', Geneva, Verdana, sans-serif;
 }
 
 .interactive {
