@@ -4,6 +4,8 @@ import (
 	"os"
 	"v2/config"
 	"v2/dmx"
+	"v2/dmx/sacn"
+	"v2/dmx/artnet"
 	"v2/view"
 	"v2/webserver"
 
@@ -44,39 +46,40 @@ func main() {
 		return
 	}
 
-	/*
-		// log.Println(cfg)
-		switch cfg.Protocol {
-		default:
-			cfg.Protocol = "sacn"
-			fallthrough
+	
+	// log.Println(cfg)
+	switch cfg.Protocol {
+	default:
+		cfg.Protocol = "sacn"
+		fallthrough
 
-		case "sacn":
-			DMX, err = sacn.NewService(&cfg)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-		case "artnet":
-			DMX, err = artnet.NewService(&cfg)
-			if err != nil {
-				log.Fatal(err)
-			}
+	case "sacn":
+		DMX, err = sacn.NewService(&cfg)
+		if err != nil {
+			log.Error().Err(err).Msg("Error starting DMX listener")
 		}
 
-		if cfg.Displays == nil || len(cfg.Displays) <= 0 {
-			p := config.Display{
-				ID: 1,
-				Layers: []config.Layer{
-					config.Layer{
-						Personality:  "basic",
-						StartAddress: 1,
-					},
+	case "artnet":
+		DMX, err = artnet.NewService(&cfg)
+		if err != nil {
+			log.Error().Err(err).Msg("Error starting DMX listener")
+		}
+	}
+
+	if cfg.Displays == nil || len(cfg.Displays) <= 0 {
+		p := config.Display{
+			ID: 1,
+			Layers: []config.Layer{
+				config.Layer{
+					Personality:  "basic",
+					StartAddress: 1,
 				},
-			}
-			cfg.Displays = append(cfg.Displays, p)
+			},
 		}
-
+		cfg.Displays = append(cfg.Displays, p)
+	}
+		
+		/*
 		if cfg.Content == nil || len(cfg.Content) <= 0 {
 			cfg.Content = map[int]content.Group{
 				1: content.Group{
@@ -92,7 +95,6 @@ func main() {
 		}
 
 		cfg.Save()
-
 		// Construct the runtime layers
 		for _, display := range cfg.Displays {
 			di := view.AddDisplay(display)
@@ -103,8 +105,8 @@ func main() {
 			}
 		}
 
-		go DMX.Run()
-	*/
+		*/
+	go DMX.Run()
 
 	view.Init(&cfg)
 	webserver.Register("/index.go", view.Index)
