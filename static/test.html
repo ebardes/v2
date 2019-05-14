@@ -1,0 +1,43 @@
+<html>
+<head>
+<style>
+canvas#c {
+   margin: 0;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	top: 0;
+	width: 100%;
+    height: 100%;
+    background: black;
+}
+
+img {
+    display: none;
+}
+</style>
+</head>
+<body onload="init()">
+<canvas id="c" width=1920 height=1080></canvas>
+<img id="img1" src="TestBars.png">
+<script>
+function init() {
+    var img = document.getElementById("img1")
+
+    var c = document.getElementById("c")
+    
+    var gl = c.getContext("2d")
+    gl.translate(960, 540)
+
+    gl.filter = "brightness(0.5) contrast(2.0)"
+    gl.rotate(0.05)
+    gl.drawImage(img, -960, -540, img.width, img.height)
+
+    gl.clear()
+    gl.rotate(0.95)
+    gl.drawImage(img, -960, -540, img.width, img.height)
+}
+</script>
+</body>
+</html>
