@@ -7,7 +7,8 @@ type Personality interface {
 }
 
 type RootPersonality struct {
-	start      int
+	display uint
+
 	Level      byte
 	Group      byte
 	Slot       byte
@@ -20,6 +21,8 @@ type RootPersonality struct {
 	Brightness int8
 	Contrast   int8
 	PlayMode   byte
+	Changed    bool
+	URL        string
 }
 
 // BasicPersonality is the core media server functionality.  It's a nice
@@ -33,6 +36,10 @@ type MediumPersonality struct {
 	BasicPersonality
 }
 
+type ExtendedPersonality struct {
+	MediumPersonality
+}
+
 // NewPersonality instantiates the appropriate fixture definitions
 func NewPersonality(personalityName string) (bp Personality) {
 	switch personalityName {
@@ -42,6 +49,9 @@ func NewPersonality(personalityName string) (bp Personality) {
 
 	case "medium":
 		bp = &MediumPersonality{}
+
+	case "extended":
+		bp = &ExtendedPersonality{}
 	}
 
 	return
@@ -54,15 +64,17 @@ func (me *BasicPersonality) Decode(b *Blob) {
 	}
 
 	me.Level = b.Byte()
-	me.Group = b.Byte()
-	me.Slot = b.Byte()
+	group := b.Byte()
+	slot := b.Byte()
+	if group != me.Group || slot != me.Slot {
+		me.Group = group
+		me.Slot = slot
+		me.Changed = true
+	} else {
+		me.Changed = false
+	}
 	me.Volume = b.Byte()
 	return
-}
-
-// Size returns the number of bytes required
-func (*BasicPersonality) Size() int {
-	return 4
 }
 
 // Decode the medium frame which extends from the Base Decode.
@@ -82,9 +94,9 @@ func (me *MediumPersonality) Decode(b *Blob) {
 	return
 }
 
-// Size returns the number of bytes required
-func (me *MediumPersonality) Size() int {
-	return me.BasicPersonality.Size() + 8
+func (me *ExtendedPersonality) Decode(b *Blob) {
+	me.MediumPersonality.Decode(b)
+	return
 }
 
 func (me *RootPersonality) DataMessage() Message {

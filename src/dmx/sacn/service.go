@@ -108,7 +108,7 @@ func (x *SACN) Run() {
 			continue
 		}
 
-		x.OnFrame(addr, x.Universe, b[0x7e:n])
+		x.OnFrame(addr, b[0x7e:n])
 	}
 	x.socket.Close()
 }

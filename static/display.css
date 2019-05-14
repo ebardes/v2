@@ -11,7 +11,7 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
-.main {
+div#viewport div canvas {
 	margin: 0;
 	position: absolute;
 	left: 0;

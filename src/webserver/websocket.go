@@ -3,7 +3,9 @@ package webserver
 import (
 	"encoding/json"
 	"net/http"
+	"sort"
 	"v2/config"
+	"v2/dmx"
 	"v2/personality"
 	"v2/view"
 
@@ -54,14 +56,18 @@ func WS(w http.ResponseWriter, r *http.Request, cfg *config.Config) error {
 			di := view.FindDisplay(d)
 			di.SetConnection(conn)
 
-			layers := []uint{}
+			layers := []int{}
 			for k := range di.Layers {
-				layers = append(layers, k)
+				layers = append(layers, int(k))
 			}
 
+			sort.Ints(layers)
 			m.Verb = personality.VerbAck
 			m.Layers = layers
 			di.Send(m)
+
+		case personality.VerbRefresh:
+			dmx.Refresh()
 		}
 	}
 

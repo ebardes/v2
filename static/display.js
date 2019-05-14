@@ -35,6 +35,7 @@ function openSocket() {
 
 function ackFunction(e) {
   console.log(e)
+  setupViewport(e)
 }
 
 function packetFunction(e) {
@@ -48,3 +49,15 @@ $(document).ready(function(){
   openSocket()
 })
 
+var canvasmap = {}
+
+function setupViewport(cfg) {
+  $('#viewport').html('')
+  var len = cfg.layers.length
+  for (var i = 0; i < len; i++) {
+    var layerid = "layer_"+cfg.layers[i]
+    var x = $('#viewport').append('<div id="'+layerid+'"><canvas id="c'+layerid+'"></canvas>')
+    canvasmap[cfg.layers[i]] = document.getElementById("c"+layerid)
+  }
+  ws.send(JSON.stringify({verb: "ref", display: display}))
+}

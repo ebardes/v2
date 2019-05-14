@@ -10,6 +10,8 @@ const (
 	VerbAck Verb = "ack"
 	// VerbPacket Data from DMX
 	VerbPacket Verb = "pkt"
+	// VerbRefresh requests a current packet be sent
+	VerbRefresh Verb = "ref"
 )
 
 // Message is a shared object between the server and the JavaScript browser side.
@@ -17,6 +19,6 @@ type Message struct {
 	Verb    Verb             `json:"verb"`
 	Display uint             `json:"display"`
 	Layer   uint             `json:"layer"`
-	Layers  []uint           `json:"layers,omitempty"`
+	Layers  []int            `json:"layers,omitempty"`
 	Packet  *RootPersonality `json:"packet,omitempty"`
 }

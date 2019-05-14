@@ -14,6 +14,7 @@ import (
 type NetDMX interface {
 	Run()
 	Stop()
+	Refresh()
 	AddLayer(start uint, layer *view.DisplayLayer)
 }
 
@@ -31,8 +32,14 @@ type DMX2Layer struct {
 	dl    *view.DisplayLayer
 }
 
+var universes map[uint][]NetDMX
+
+func init() {
+	universes = make(map[uint][]NetDMX)
+}
+
 // OnFrame is the main event listener for when DMX packets arrive
-func (me *Common) OnFrame(addr net.Addr, universe int, b []byte) {
+func (me *Common) OnFrame(addr net.Addr, b []byte) {
 	me.Sync.Lock()
 	defer me.Sync.Unlock()
 
@@ -69,4 +76,12 @@ func (me *Common) AddLayer(start uint, dl *view.DisplayLayer) {
 		me.Layers = []DMX2Layer{}
 	}
 	me.Layers = append(me.Layers, DMX2Layer{start - 1, dl})
+}
+
+func Refresh() {
+	for _, u := range universes {
+		for _, d := range u {
+			d.Refresh()
+		}
+	}
 }

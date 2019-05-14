@@ -71,7 +71,7 @@ func main() {
 			ID: 1,
 			Layers: []config.Layer{
 				config.Layer{
-					Personality:  "basic",
+					Personality:  "regular",
 					StartAddress: 1,
 				},
 			},
