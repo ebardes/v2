@@ -2,10 +2,11 @@ package sacn
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"v2/config"
 	"v2/dmx"
+
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -69,16 +70,16 @@ func NewService(c *config.Config) (*SACN, error) {
 
 	ifi, err := net.InterfaceByName(c.Interface)
 	if err != nil {
-		log.Println(err)
+		log.Error().Err(err).Msg("Error")
 		ifi = nil
 	}
 	gaddr, err := net.ResolveUDPAddr("udp", network)
 	if err != nil {
-		log.Println(err)
+		log.Error().Err(err).Msg("Error")
 	}
 	socket, err := net.ListenMulticastUDP("udp", ifi, gaddr)
 	if err != nil {
-		log.Println(err)
+		log.Error().Err(err).Msg("Error")
 	}
 
 	x.socket = socket
@@ -87,14 +88,14 @@ func NewService(c *config.Config) (*SACN, error) {
 
 // Run starts a listening thread
 func (x *SACN) Run() {
-	log.Println("Started goroutine")
-	defer log.Println("Exit goroutine")
+	log.Info().Msg("Started goroutine")
+	defer log.Info().Msg("Exit goroutine")
 
 	b := make([]byte, maxDatagramSize)
 	for {
 		n, addr, err := x.socket.ReadFrom(b)
 		if err != nil {
-			log.Println(err)
+			log.Error().Err(err).Msg("Error")
 			break
 		}
 

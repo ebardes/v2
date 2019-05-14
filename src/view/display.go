@@ -1,8 +1,6 @@
 package view
 
 import (
-	"bytes"
-	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -60,10 +58,22 @@ func (me *DisplayInfo) AddLayer(start int, p personality.Personality) *DisplayLa
 }
 
 func (me *DisplayLayer) OnFrame(b []byte) {
-	err := binary.Read(bytes.NewReader(b), binary.LittleEndian, &me.P)
-	if err != nil {
-		log.Println(err)
-		return
+	// err := binary.Read(bytes.NewReader(b), binary.LittleEndian, &me.P)
+	blob := personality.Blob{
+		Data: b,
+		Pos:  0,
 	}
-	log.Println(json.Marshal(me.P))
+	me.P.Decode(&blob)
+	j, _ := json.Marshal(me.P)
+	log.Println(string(j))
+}
+
+func AddDisplay(cd *config.Display) (di *DisplayInfo) {
+	di = &DisplayInfo{}
+	di.Layers = make(map[int]DisplayLayer)
+	// for _, l := range cd.Layers {
+	// 	p := personality.NewPersonality("basic")
+	// 	di.AddLayer(l.StartAddress, p)
+	// }
+	return
 }

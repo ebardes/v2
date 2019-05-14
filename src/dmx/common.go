@@ -2,10 +2,9 @@ package dmx
 
 import (
 	"bytes"
-	"encoding/hex"
-	"fmt"
 	"log"
 	"net"
+	"sync"
 	"v2/config"
 	"v2/view"
 )
@@ -23,6 +22,7 @@ type Common struct {
 	Frame  []byte
 	Cfg    *config.Config
 	Layers []DMX2Layer
+	Sync   sync.Mutex
 }
 
 type DMX2Layer struct {
@@ -32,6 +32,9 @@ type DMX2Layer struct {
 
 // OnFrame is the main event listener for when DMX packets arrive
 func (me *Common) OnFrame(addr net.Addr, universe int, b []byte) {
+	me.Sync.Lock()
+	defer me.Sync.Unlock()
+
 	if !bytes.Equal(b, me.Frame) {
 		if len(me.Frame) != len(b) {
 			me.Frame = make([]byte, len(b))
@@ -41,10 +44,12 @@ func (me *Common) OnFrame(addr net.Addr, universe int, b []byte) {
 			log.Printf("Packet from %v size %d\n", addr, len(b))
 		}
 
-		if me.Cfg != nil && me.Cfg.DebugLevel > 1 {
-			fmt.Printf("Universe: %d\n", universe)
-			fmt.Print(hex.Dump(b))
-		}
+		/*
+			if me.Cfg != nil && me.Cfg.DebugLevel > 1 {
+				fmt.Printf("Universe: %d\n", universe)
+				fmt.Print(hex.Dump(b))
+			}
+		*/
 
 		if me.Layers != nil {
 			for _, layer := range me.Layers {

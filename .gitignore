@@ -1,8 +1,10 @@
 ._*
 
+.vscode
 v2
 main
 bin
 pkg
 src/github.com
 src/golang.org
+src/go.sum

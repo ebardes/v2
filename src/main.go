@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"v2/config"
 	"v2/dmx"
-	"v2/dmx/sacn"
 	"v2/dmx/artnet"
+	"v2/dmx/sacn"
+	"v2/personality"
 	"v2/view"
 	"v2/webserver"
 
@@ -46,7 +48,6 @@ func main() {
 		return
 	}
 
-	
 	// log.Println(cfg)
 	switch cfg.Protocol {
 	default:
@@ -78,8 +79,8 @@ func main() {
 		}
 		cfg.Displays = append(cfg.Displays, p)
 	}
-		
-		/*
+
+	/*
 		if cfg.Content == nil || len(cfg.Content) <= 0 {
 			cfg.Content = map[int]content.Group{
 				1: content.Group{
@@ -93,19 +94,20 @@ func main() {
 				},
 			}
 		}
-
 		cfg.Save()
-		// Construct the runtime layers
-		for _, display := range cfg.Displays {
-			di := view.AddDisplay(display)
-			for _, layer := range display.Layers {
-				p := personality.NewPersonality(layer)
-				dl := di.AddLayer(layer.StartAddress, p)
-				DMX.AddLayer(layer.StartAddress, dl)
-			}
-		}
+	*/
 
-		*/
+	// Construct the runtime layers
+	for _, display := range cfg.Displays {
+		log.Info().Msg(fmt.Sprintf("%v", display))
+		di := view.AddDisplay(&display)
+		for _, layer := range display.Layers {
+			p := personality.NewPersonality(layer.Personality)
+			dl := di.AddLayer(layer.StartAddress, p)
+			DMX.AddLayer(layer.StartAddress, dl)
+		}
+	}
+
 	go DMX.Run()
 
 	view.Init(&cfg)
