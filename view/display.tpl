@@ -7,8 +7,6 @@
   <script type="text/javascript">var display={{- .Data.ID -}};</script>
 </head>
 <body>
-{{- range $i,$x := .Data.Layers -}}
-  <canvas id="main_{{$i}}" class="main"></canvas>
-{{- end -}}
+<div id="viewport"></div>
 </body>
 </html>

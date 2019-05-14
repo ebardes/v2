@@ -3,21 +3,15 @@ package personality
 // Personality is the base interface for all personalities.
 type Personality interface {
 	Decode(*Blob)
+	DataMessage() Message
 }
 
-// BasicPersonality is the core media server functionality.  It's a nice
-// compact four channel personality.
-type BasicPersonality struct {
-	start  int
-	Level  byte
-	Group  byte
-	Slot   byte
-	Volume byte
-}
-
-// MediumPersonality extends the BasePersonality with scaling and pan functions.
-type MediumPersonality struct {
-	BasicPersonality
+type RootPersonality struct {
+	start      int
+	Level      byte
+	Group      byte
+	Slot       byte
+	Volume     byte
 	X          int16
 	Y          int16
 	Xsize      int16
@@ -26,6 +20,17 @@ type MediumPersonality struct {
 	Brightness int8
 	Contrast   int8
 	PlayMode   byte
+}
+
+// BasicPersonality is the core media server functionality.  It's a nice
+// compact four channel personality.
+type BasicPersonality struct {
+	RootPersonality
+}
+
+// MediumPersonality extends the BasePersonality with scaling and pan functions.
+type MediumPersonality struct {
+	BasicPersonality
 }
 
 // NewPersonality instantiates the appropriate fixture definitions
@@ -80,4 +85,11 @@ func (me *MediumPersonality) Decode(b *Blob) {
 // Size returns the number of bytes required
 func (me *MediumPersonality) Size() int {
 	return me.BasicPersonality.Size() + 8
+}
+
+func (me *RootPersonality) DataMessage() Message {
+	return Message{
+		Verb:   VerbPacket,
+		Packet: me,
+	}
 }

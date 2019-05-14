@@ -1,7 +1,5 @@
 var ws
 
-$(document).ready()
-
 function openSocket() {
   var dest = "ws://" + location.host + "/ws/"
   console.log(document.URL)
@@ -15,7 +13,7 @@ function openSocket() {
 
   ws.onopen = function(evt) {
     console.log("OPEN");
-    ws.send(JSON.stringify({verb: "reg", display: panel}))
+    ws.send(JSON.stringify({verb: "reg", display: display}))
   }
   ws.onclose = function(evt) {
     console.log("CLOSE");
@@ -41,6 +39,12 @@ function ackFunction(e) {
 
 function packetFunction(e) {
   console.log(
-    "I got a packet!"
+    "I got a packet!",
+    e
   )
 }
+
+$(document).ready(function(){
+  openSocket()
+})
+

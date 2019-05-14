@@ -48,7 +48,6 @@ func main() {
 		return
 	}
 
-	// log.Println(cfg)
 	switch cfg.Protocol {
 	default:
 		cfg.Protocol = "sacn"
@@ -100,7 +99,7 @@ func main() {
 	// Construct the runtime layers
 	for _, display := range cfg.Displays {
 		log.Info().Msg(fmt.Sprintf("%v", display))
-		di := view.AddDisplay(&display)
+		di := view.FindDisplay(&display)
 		for _, layer := range display.Layers {
 			p := personality.NewPersonality(layer.Personality)
 			dl := di.AddLayer(layer.StartAddress, p)

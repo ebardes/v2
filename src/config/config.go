@@ -15,13 +15,13 @@ const (
 )
 
 type Layer struct {
-	StartAddress int    `json:"dmx_start"`
+	StartAddress uint   `json:"dmx_start"`
 	Personality  string `json:"personality"`
 }
 
 // Display Describes a pane which is a single display
 type Display struct {
-	ID     int     `json:"id"`
+	ID     uint    `json:"id"`
 	Layers []Layer `json:"layers"`
 }
 
@@ -77,9 +77,9 @@ func getLocation() string {
 	return path.Join(u.HomeDir, DefaultName)
 }
 
-func (c *Config) GetDisplay(id int) (d *Display, err error) {
+func (c *Config) GetDisplay(id uint) (d *Display, err error) {
 	id--
-	if id < 0 || id > len(c.Displays) {
+	if id < 0 || id > uint(len(c.Displays)) {
 		err = fmt.Errorf("Display ID out of range")
 		return
 	}

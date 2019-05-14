@@ -14,11 +14,9 @@ const (
 
 // Message is a shared object between the server and the JavaScript browser side.
 type Message struct {
-	Verb    Verb   `json:"verb"`
-	Display int    `json:"display"`
-	Packet  []byte `json:"packet"`
-	Start   int    `json:"start"`
-	Lenght  int    `json:"end"`
-	// Layer   uint   `json:"layer"`
-	// Packet  Personality `json:"packet,optional"`
+	Verb    Verb             `json:"verb"`
+	Display uint             `json:"display"`
+	Layer   uint             `json:"layer"`
+	Layers  []uint           `json:"layers,omitempty"`
+	Packet  *RootPersonality `json:"packet,omitempty"`
 }

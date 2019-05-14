@@ -2,13 +2,13 @@ package webserver
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"v2/config"
 	"v2/personality"
 	"v2/view"
 
 	"github.com/gorilla/websocket"
+	"github.com/rs/zerolog/log"
 )
 
 var upgrader = websocket.Upgrader{
@@ -20,23 +20,27 @@ var upgrader = websocket.Upgrader{
 func WS(w http.ResponseWriter, r *http.Request, cfg *config.Config) error {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		log.Print(err)
 		return err
 	}
 	defer conn.Close()
 
-	log.Printf("Received connection from %v\n", conn.RemoteAddr())
+	log.Printf("Received websocket connection from %v\n", conn.RemoteAddr())
 	for {
-		_, p, err := conn.ReadMessage()
+		x, p, err := conn.ReadMessage()
+		if x == -1 {
+			break // end of stream
+		}
+
 		if err != nil {
-			log.Println(err)
+			log.Error().Err(err).Int("x", x).Msg("read error")
 			return err
 		}
 
 		var m personality.Message
 		err = json.Unmarshal(p, &m)
 		if err != nil {
-			log.Println(err)
+			log.Print(err)
 			return err
 		}
 
@@ -47,15 +51,21 @@ func WS(w http.ResponseWriter, r *http.Request, cfg *config.Config) error {
 				return err
 			}
 
-			di := view.DisplayInfo{}
-			for i := range d.Layers {
-				dl := view.DisplayLayer{}
-				di.Layers[i] = dl
-			}
+			di := view.FindDisplay(d)
 			di.SetConnection(conn)
-			m.Verb = personality.VerbAck
 
+			layers := []uint{}
+			for k := range di.Layers {
+				layers = append(layers, k)
+			}
+
+			m.Verb = personality.VerbAck
+			m.Layers = layers
 			di.Send(m)
 		}
 	}
+
+	view.RemoveConnection(conn)
+	log.Print("Websocket shutdown")
+	return nil
 }

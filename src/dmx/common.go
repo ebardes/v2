@@ -2,18 +2,19 @@ package dmx
 
 import (
 	"bytes"
-	"log"
 	"net"
 	"sync"
 	"v2/config"
 	"v2/view"
+
+	"github.com/rs/zerolog/log"
 )
 
 // NetDMX is the base interface for DMX
 type NetDMX interface {
 	Run()
 	Stop()
-	AddLayer(start int, layer *view.DisplayLayer)
+	AddLayer(start uint, layer *view.DisplayLayer)
 }
 
 // Common stores aspects common to all Networked DMX implementations
@@ -26,7 +27,7 @@ type Common struct {
 }
 
 type DMX2Layer struct {
-	start int
+	start uint
 	dl    *view.DisplayLayer
 }
 
@@ -59,7 +60,11 @@ func (me *Common) OnFrame(addr net.Addr, universe int, b []byte) {
 	}
 }
 
-func (me *Common) AddLayer(start int, dl *view.DisplayLayer) {
+func (me *Common) Refresh() {
+	me.Frame = []byte{}
+}
+
+func (me *Common) AddLayer(start uint, dl *view.DisplayLayer) {
 	if me.Layers == nil {
 		me.Layers = []DMX2Layer{}
 	}
