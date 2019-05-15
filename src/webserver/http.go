@@ -52,7 +52,8 @@ func Run(config *config.Config) {
 		http.FileServer(http.Dir(cfg.StaticDir)),
 	})
 
-	http.HandleFunc("/post/", post)
+	http.Handle("/post/", &wrap{f: post})
+	http.Handle("/media/", &wrap{f: media})
 
 	enumInterfaces()
 	addr := fmt.Sprintf(":%d", cfg.WebPort)
@@ -92,18 +93,30 @@ func enumInterfaces() (err error) {
 	return
 }
 
-func post(w http.ResponseWriter, r *http.Request) {
+type wrap struct {
+	f func(http.ResponseWriter, *http.Request) error
+}
+
+func (x *wrap) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	err := x.f(w, r)
+	if err != nil {
+		w.Write([]byte(fmt.Sprintf("%v", err)))
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+}
+
+func post(w http.ResponseWriter, r *http.Request) (err error) {
 	cfg := config.GlobalConfig
 
 	uri := r.RequestURI
 	n := strings.LastIndex(uri, "/")
 	if n < 0 {
-		return
+		return fmt.Errorf("Invalid URI - must include numeric group")
 	}
 	uri = uri[n+1:]
 	group, _ := strconv.Atoi(uri)
 	if group <= 0 {
-		return
+		return fmt.Errorf("Invalid URI - must include numeric group")
 	}
 
 	f, fh, err := r.FormFile("file")
@@ -158,4 +171,9 @@ func post(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	return
+}
+
+func media(w http.ResponseWriter, r *http.Request) (err error) {
+	return fmt.Errorf("Trick error")
 }
