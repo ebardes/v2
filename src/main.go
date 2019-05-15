@@ -38,7 +38,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	var cfg config.Config
+	cfg := &config.GlobalConfig
 	cfg.TemplateDir = opts.TemplateDir
 	cfg.Static = opts.Static
 
@@ -54,13 +54,13 @@ func main() {
 		fallthrough
 
 	case "sacn":
-		DMX, err = sacn.NewService(&cfg)
+		DMX, err = sacn.NewService(cfg)
 		if err != nil {
 			log.Error().Err(err).Msg("Error starting DMX listener")
 		}
 
 	case "artnet":
-		DMX, err = artnet.NewService(&cfg)
+		DMX, err = artnet.NewService(cfg)
 		if err != nil {
 			log.Error().Err(err).Msg("Error starting DMX listener")
 		}
@@ -109,10 +109,10 @@ func main() {
 
 	go DMX.Run()
 
-	view.Init(&cfg)
+	view.Init(cfg)
 	webserver.Register("/index.go", view.Index)
 	webserver.Register("/config.go", view.Config)
 	webserver.Register("/display/", view.Display)
 	webserver.Register("/ws/", webserver.WS)
-	webserver.Run(&cfg)
+	webserver.Run(cfg)
 }

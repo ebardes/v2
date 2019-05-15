@@ -38,6 +38,8 @@ type Config struct {
 	Static      string                `json:"-"`
 }
 
+var GlobalConfig Config
+
 // Save Saves the config files in a default location
 func (c *Config) Save() error {
 	temp := getLocation() + ".tmp"

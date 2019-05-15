@@ -4,6 +4,11 @@ import "encoding/json"
 
 type Slot interface {
 	GetPreview() string
+	GetURL() string
+}
+
+type SlotCommon struct {
+	Slot
 }
 
 type Group struct {
@@ -26,6 +31,10 @@ type HTML struct {
 	Slot
 	Name string `json:"name"`
 	Body string `json:"body"`
+}
+
+func (me *Image) GetURL() string {
+	return me.URL
 }
 
 func (img *Image) MarshalJSON() (b []byte, err error) {

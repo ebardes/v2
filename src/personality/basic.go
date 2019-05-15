@@ -1,5 +1,7 @@
 package personality
 
+import "v2/config"
+
 // Personality is the base interface for all personalities.
 type Personality interface {
 	Decode(*Blob)
@@ -70,6 +72,19 @@ func (me *BasicPersonality) Decode(b *Blob) {
 		me.Group = group
 		me.Slot = slot
 		me.Changed = true
+
+		cfg := &config.GlobalConfig
+		grp, ok := cfg.Content[int(group)]
+		if ok {
+			slot, ok := grp.Slots[int(slot)]
+			if ok {
+				me.URL = slot.GetURL()
+			} else {
+				me.URL = ""
+			}
+		} else {
+			me.URL = ""
+		}
 	} else {
 		me.Changed = false
 	}
