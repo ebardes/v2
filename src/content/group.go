@@ -5,10 +5,17 @@ import "encoding/json"
 type Slot interface {
 	GetPreview() string
 	GetURL() string
+
+	GetName() string
+	SetName(string)
+	SetSize(uint64)
 }
 
 type SlotCommon struct {
 	Slot
+	Name string `json:"name"`
+	Size uint64 `json:"size"`
+	Mime string `json:"mime`
 }
 
 type Group struct {
@@ -16,35 +23,38 @@ type Group struct {
 }
 
 type Image struct {
-	Slot
-	Name string `json:"name"`
-	URL  string `json:"url"`
+	SlotCommon
+	URL string `json:"url"`
 }
 
 type Video struct {
-	Slot
-	Name string `json:"name"`
-	URL  string `json:"url"`
+	SlotCommon
+	URL string `json:"url"`
 }
 
 type HTML struct {
-	Slot
-	Name string `json:"name"`
+	SlotCommon
 	Body string `json:"body"`
 }
 
-func (me *Image) GetURL() string {
-	return me.URL
-}
+func (me *SlotCommon) GetName() string     { return me.Name }
+func (me *SlotCommon) SetSize(size uint64) { me.Size = size }
+func (me *SlotCommon) SetName(name string) { me.Name = name }
+
+func (me *Image) GetURL() string { return me.URL }
 
 func (img *Image) MarshalJSON() (b []byte, err error) {
 	return json.Marshal(&struct {
 		Type string `json:"type"`
 		Name string `json:"name"`
+		Mime string `json:"mime"`
+		Size uint64 `json:"size"`
 		URL  string `json:"URL"`
 	}{
 		Type: "IMAGE",
 		Name: img.Name,
+		Mime: img.Mime,
+		Size: img.Size,
 		URL:  img.URL,
 	})
 }
@@ -53,10 +63,14 @@ func (vid *Video) MarshalJSON() (b []byte, err error) {
 	return json.Marshal(&struct {
 		Type string `json:"type"`
 		Name string `json:"name"`
+		Mime string `json:"mime"`
+		Size uint64 `json:"size"`
 		URL  string `json:"URL"`
 	}{
 		Type: "VIDEO",
 		Name: vid.Name,
+		Mime: vid.Mime,
+		Size: vid.Size,
 		URL:  vid.URL,
 	})
 }
@@ -65,10 +79,14 @@ func (html *HTML) MarshalJSON() (b []byte, err error) {
 	return json.Marshal(&struct {
 		Type string `json:"type"`
 		Name string `json:"name"`
+		Mime string `json:"mime"`
+		Size uint64 `json:"size"`
 		Body string `json:"body"`
 	}{
 		Type: "HTML",
 		Name: html.Name,
+		Mime: html.Mime,
+		Size: html.Size,
 		Body: html.Body,
 	})
 }

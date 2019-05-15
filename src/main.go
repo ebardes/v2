@@ -40,7 +40,7 @@ func main() {
 
 	cfg := &config.GlobalConfig
 	cfg.TemplateDir = opts.TemplateDir
-	cfg.Static = opts.Static
+	cfg.StaticDir = opts.Static
 
 	err = cfg.Load()
 	if err != nil {

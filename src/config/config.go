@@ -33,9 +33,10 @@ type Config struct {
 	Interface   string                `json:"interface"`
 	Protocol    string                `json:"protocol"`
 	Displays    []Display             `json:"display"`
+	ContentDir  string                `json:"content-directory"`
 	Content     map[int]content.Group `json:"groups"`
 	TemplateDir string                `json:"-"`
-	Static      string                `json:"-"`
+	StaticDir   string                `json:"-"`
 }
 
 var GlobalConfig Config

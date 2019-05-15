@@ -34,7 +34,6 @@ function openSocket() {
 }
 
 function ackFunction(e) {
-  console.log(e)
   setupViewport(e)
 }
 
@@ -64,15 +63,21 @@ function packetFunction(e) {
   gl.fillStyle='#000000'
   gl.fillRect(0,0,sizex, sizey)
   gl.translate(centerx, centery)
+
   // bright = (packet.Brightness / 127.0) + 1.0
   // gl.filter = "brightness("+bright+")"
+  // packet.bright = bright
+
   gl.rotate((packet.ZRotate) / 32768.0)
   gl.drawImage(img, -centerx, -centery, img.width, img.height)
   
   gl1.drawImage(composite, 0, 0)
 
-  // packet.bright = bright
-  console.log(packet)
+  if e.layer == 1 {
+    console.log(packet)
+  }
+
+  
 }
 
 $(document).ready(function(){

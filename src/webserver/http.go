@@ -2,9 +2,15 @@ package webserver
 
 import (
 	"fmt"
+	"io"
 	"net"
 	"net/http"
+	"os"
+	"path"
+	"strconv"
+	"strings"
 	"v2/config"
+	"v2/content"
 
 	"github.com/rs/zerolog/log"
 )
@@ -43,8 +49,10 @@ func (s *static) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func Run(config *config.Config) {
 	cfg = config
 	http.Handle("/", &static{
-		http.FileServer(http.Dir(cfg.Static)),
+		http.FileServer(http.Dir(cfg.StaticDir)),
 	})
+
+	http.HandleFunc("/post/", post)
 
 	enumInterfaces()
 	addr := fmt.Sprintf(":%d", cfg.WebPort)
@@ -82,4 +90,72 @@ func enumInterfaces() (err error) {
 		}
 	}
 	return
+}
+
+func post(w http.ResponseWriter, r *http.Request) {
+	cfg := config.GlobalConfig
+
+	uri := r.RequestURI
+	n := strings.LastIndex(uri, "/")
+	if n < 0 {
+		return
+	}
+	uri = uri[n+1:]
+	group, _ := strconv.Atoi(uri)
+	if group <= 0 {
+		return
+	}
+
+	f, fh, err := r.FormFile("file")
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	log.Info().Str("filename", fh.Filename).Int("group", group).Msg("Upload")
+
+	targetdir := path.Join(cfg.ContentDir, uri)
+	os.MkdirAll(targetdir, 0777)
+	dest := path.Join(targetdir, fh.Filename)
+
+	fio, err := os.Create(dest)
+	if err != nil {
+		log.Error().Err(err).Str("destination", dest).Msg("Can not create file")
+		return
+	}
+	defer fio.Close()
+
+	_, err = io.Copy(fio, f)
+	if err != nil {
+		return
+	}
+
+	grp := cfg.Content[group]
+	for _, slot := range grp.Slots {
+		if slot.GetName() == fh.Filename {
+			slot.SetSize(uint64(fh.Size))
+			cfg.Save()
+			return
+		}
+	}
+
+	// new item adding
+	for i := 1; i <= 255; i++ {
+		_, ok := grp.Slots[i]
+		if ok {
+			continue
+		}
+
+		mime := fh.Header.Get("Content-Type")
+		if strings.HasPrefix(mime, "image/") {
+			slot := &content.Image{}
+			slot.Name = fh.Filename
+			slot.Size = uint64(fh.Size)
+			slot.Mime = mime
+			slot.URL = path.Join("media", uri, fh.Filename)
+
+			grp.Slots[i] = slot
+			cfg.Save()
+			return
+		}
+	}
 }

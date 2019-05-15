@@ -1,4 +1,4 @@
-{{template "head"}}
+{{- template "head" -}}
 	<div class="interactive">
 		<h1>Network</h1>
 		<div>Universe: <b>{{.Data.Universe}}</b></div>
@@ -26,8 +26,15 @@
 				<div class="body"><img src="{{- .URL }}" /></div>
 			</div>
 			{{- end -}}
+			{{- if ne 0 $n -}}
+			<div class="slot">
+				<div class="head">New Content</div>
+				<div class="new body" group="{{$n}}">
+				</div>
+			</div>
+			{{- end -}}
 		{{- end -}}
 	</div>
 
 	<pre>{{.Data}}</pre>
-{{template "foot"}}
+{{- template "foot" -}}
