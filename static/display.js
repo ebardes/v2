@@ -56,8 +56,11 @@ function setupViewport(cfg) {
   var len = cfg.layers.length
   for (var i = 0; i < len; i++) {
     var layerid = "layer_"+cfg.layers[i]
-    var x = $('#viewport').append('<div id="'+layerid+'"><canvas id="c'+layerid+'"></canvas>')
-    canvasmap[cfg.layers[i]] = document.getElementById("c"+layerid)
+    var x = $('#viewport').append('<div id="'+layerid+'"><canvas id="c'+layerid+'"></canvas><img id="i'+layerid+'"/>')
+    var c = document.getElementById("c"+layerid)
+    canvasmap[cfg.layers[i]] = c
+    c.width = 1920
+    c.height = 1080
   }
   ws.send(JSON.stringify({verb: "ref", display: display}))
 }
