@@ -58,7 +58,7 @@ func Run(config *config.Config) {
 	enumInterfaces()
 	addr := fmt.Sprintf(":%d", cfg.WebPort)
 	log.Info().Msg("Listening to " + addr)
-	http.ListenAndServe(addr, nil)
+	log.Error().Err(http.ListenAndServe(addr, nil)).Msg("Error setting up HTTP server")
 }
 
 func enumInterfaces() (err error) {
@@ -100,8 +100,8 @@ type wrap struct {
 func (x *wrap) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := x.f(w, r)
 	if err != nil {
-		w.Write([]byte(fmt.Sprintf("%v", err)))
 		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(fmt.Sprintf("%v", err)))
 	}
 }
 
@@ -175,5 +175,12 @@ func post(w http.ResponseWriter, r *http.Request) (err error) {
 }
 
 func media(w http.ResponseWriter, r *http.Request) (err error) {
-	return fmt.Errorf("Trick error")
+	cfg := config.GlobalConfig
+	uri := r.RequestURI
+	if strings.HasPrefix(uri, "/media/") {
+		uri = uri[7:]
+	}
+	target := path.Join(cfg.ContentDir, uri)
+	http.ServeFile(w, r, target)
+	return
 }
