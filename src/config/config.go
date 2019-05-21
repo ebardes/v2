@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/user"
 	"path"
+	"strconv"
 	"v2/content"
 )
 
@@ -79,6 +80,23 @@ func (c *Config) Load() (err error) {
 
 // Normalize performs sanitiy checking of the state of the config
 func (c *Config) Normalize() {
+	for g, grp := range c.Content {
+		if g == 0 {
+			continue
+		}
+		r := make([]int, 0)
+		for i, slt := range grp.Slots {
+			target := path.Join(c.ContentDir, strconv.Itoa(g), slt.GetName())
+			if _, err := os.Stat(target); err != nil {
+				r = append(r, i)
+			}
+		}
+
+		for _, x := range r {
+			delete(grp.Slots, x)
+		}
+	}
+
 	for i := 1; i <= 255; i++ {
 		if group, ok := c.Content[i]; !ok {
 			c.Content[i] = content.Group{

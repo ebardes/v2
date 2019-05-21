@@ -23,7 +23,11 @@
 			{{- range $id, $slot := .Slots -}}
 			<div class="slot">
 				<div class="head"><b>{{- $id -}}</b>: {{ .Name -}}</div>
-				<div class="body"><img src="{{- .URL }}" /><div class="delete" id="/delete/{{$n}}/{{$id}}">Del</div></div>
+				<div class="body"><img src="{{- .URL }}" />
+					{{- if ne 0 $n -}}	
+					<div class="delete" id="/delete/{{$n}}/{{$id}}">Del</div>
+					{{- end -}}
+				</div>
 			</div>
 			{{- end -}}
 			{{- if ne 0 $n -}}
@@ -34,6 +38,4 @@
 			{{- end -}}
 		{{- end -}}
 	</div>
-
-	<pre>{{.Data}}</pre>
 {{- template "foot" -}}

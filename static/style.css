@@ -46,10 +46,11 @@ a {
 }
 
 .slot {
-	display: table-cell;
+	display: inline-table;
 	width: 250px;
-	height: 220px;
+	height: 250px;
 	padding-right: 3px;
+	padding-bottom: 3px;
 }
 
 .slot .head {
@@ -81,7 +82,6 @@ a {
 }
 
 .slot .body .delete {
-	float: right;
 	width: 30px;
 	height: 20px;
 	font-size: 8pt;
