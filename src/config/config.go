@@ -80,11 +80,15 @@ func (c *Config) Load() (err error) {
 // Normalize performs sanitiy checking of the state of the config
 func (c *Config) Normalize() {
 	for i := 1; i <= 255; i++ {
-		if _, ok := c.Content[i]; !ok {
+		if group, ok := c.Content[i]; !ok {
 			c.Content[i] = content.Group{
 				Slots: make(map[int]content.Slot),
 			}
 			break
+		} else {
+			if len(group.Slots) == 0 {
+				break
+			}
 		}
 	}
 }
