@@ -45,6 +45,8 @@ var GlobalConfig Config
 func (c *Config) Save() error {
 	temp := getLocation() + ".tmp"
 
+	c.Normalize()
+
 	f, err := os.Create(temp)
 	if err != nil {
 		return err
@@ -73,6 +75,18 @@ func (c *Config) Load() (err error) {
 
 	d := json.NewDecoder(f)
 	return d.Decode(c)
+}
+
+// Normalize performs sanitiy checking of the state of the config
+func (c *Config) Normalize() {
+	for i := 1; i <= 255; i++ {
+		if _, ok := c.Content[i]; !ok {
+			c.Content[i] = content.Group{
+				Slots: make(map[int]content.Slot),
+			}
+			break
+		}
+	}
 }
 
 func getLocation() string {

@@ -47,6 +47,7 @@ func main() {
 		log.Error().Err(err).Msg("Unable to load config file")
 		return
 	}
+	cfg.Normalize()
 
 	switch cfg.Protocol {
 	default:
