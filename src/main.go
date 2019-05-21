@@ -7,6 +7,7 @@ import (
 	"v2/dmx"
 	"v2/dmx/artnet"
 	"v2/dmx/sacn"
+	"v2/gui"
 	"v2/personality"
 	"v2/view"
 	"v2/webserver"
@@ -109,7 +110,12 @@ func main() {
 	}
 
 	go DMX.Run()
+	go ws(cfg)
+	
+	gui.GUIInit()
+}
 
+func ws(cfg *config.Config) {
 	view.Init(cfg)
 	webserver.Register("/index.go", view.Index)
 	webserver.Register("/config.go", view.Config)
