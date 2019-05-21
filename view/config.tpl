@@ -22,15 +22,14 @@
 		<h3>Group {{$n}}</h3>
 			{{- range $id, $slot := .Slots -}}
 			<div class="slot">
-				<div class="head">{{- $id -}}: {{ .Name -}}</div>
-				<div class="body"><img src="{{- .URL }}" /></div>
+				<div class="head"><b>{{- $id -}}</b>: {{ .Name -}}</div>
+				<div class="body"><img src="{{- .URL }}" /><div class="delete" id="/delete/{{$n}}/{{$id}}">Del</div></div>
 			</div>
 			{{- end -}}
 			{{- if ne 0 $n -}}
 			<div class="slot">
 				<div class="head">New Content</div>
-				<div class="new body" group="{{$n}}">
-				</div>
+				<div class="new body" group="{{$n}}"></div>
 			</div>
 			{{- end -}}
 		{{- end -}}

@@ -79,3 +79,14 @@ a {
 .slot .new {
 	background: hsl(90, 70%, 10%);
 }
+
+.slot .body .delete {
+	float: right;
+	width: 30px;
+	height: 20px;
+	font-size: 8pt;
+	cursor: pointer;
+	border-radius: 2px;
+	border: 1px solid hsl(0, 30%, 50%);
+	background-color: hsl(0, 50%, 30%);
+}

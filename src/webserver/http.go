@@ -5,6 +5,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strconv"
@@ -54,6 +55,7 @@ func Run(config *config.Config) {
 
 	http.Handle("/post/", &wrap{f: post})
 	http.Handle("/media/", &wrap{f: media})
+	http.Handle("/delete/", &wrap{f: remove})
 
 	enumInterfaces()
 	addr := fmt.Sprintf(":%d", cfg.WebPort)
@@ -176,11 +178,51 @@ func post(w http.ResponseWriter, r *http.Request) (err error) {
 
 func media(w http.ResponseWriter, r *http.Request) (err error) {
 	cfg := config.GlobalConfig
-	uri := r.RequestURI
+	uri := r.URL.RequestURI()
+	uri, err = url.QueryUnescape(uri)
+	if err != nil {
+		return
+	}
+
 	if strings.HasPrefix(uri, "/media/") {
 		uri = uri[7:]
 	}
+
 	target := path.Join(cfg.ContentDir, uri)
 	http.ServeFile(w, r, target)
+	return
+}
+
+func remove(w http.ResponseWriter, r *http.Request) (err error) {
+	cfg := config.GlobalConfig
+	uri := r.URL.RequestURI()
+	uri, err = url.QueryUnescape(uri)
+	if err != nil {
+		return
+	}
+
+	if strings.HasPrefix(uri, "/delete/") {
+		uri = uri[8:]
+	}
+
+	var group, slot int
+
+	_, err = fmt.Sscanf(uri, "%d/%d", &group, &slot)
+	if err != nil {
+		return
+	}
+
+	g, ok := cfg.Content[group]
+	if !ok {
+		return
+	}
+
+	s, ok := g.Slots[slot]
+
+	target := path.Join(cfg.ContentDir, strconv.Itoa(group), s.GetName())
+	os.Remove(target)
+	delete(g.Slots, slot)
+	cfg.Save()
+
 	return
 }

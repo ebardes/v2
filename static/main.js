@@ -9,4 +9,12 @@ $(document).ready(function() {
             acceptedFiles: "image/*"
         })
     })
+
+    x = $("div.delete")
+    x.on("click", function(e) {
+        console.log(e)
+        $.ajax({
+            url: e.target.id
+        })
+    })
 })
