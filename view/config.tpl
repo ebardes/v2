@@ -1,9 +1,26 @@
 {{- template "head" -}}
 	<div class="interactive">
 		<h1>Network</h1>
-		<div>Universe: <b>{{.Data.Universe}}</b></div>
-		<div>Protocol: <b>{{.Data.Protocol}}</b></div>
-		<div>Adapter: <b>{{.Data.Interface}}</b></div>
+		<form id="netcfg">
+		<div>Universe: <input name="universe" value="{{.Data.Universe}}"></div>
+		{{- $p := .Data.Protocol -}}
+		<div>Protocol:
+			<select name="protocol">
+			{{- range .Data.Protocols -}}
+			<option {{ if eq . $p -}}selected="selected" {{ end -}}value="{{.}}">{{.}}</option>
+			{{- end -}}
+			</select>
+		</div>
+		{{- $n := .Data.Interface -}}
+		<div>Adapter:
+			<select name="network">
+			{{- range .Data.Networks -}}
+			<option {{ if eq .Name $n -}}selected="selected" {{ end -}}value="{{.Name}}">{{.Name}} - {{.IPAddress}}</option>
+			{{- end -}}
+			</select>
+		</div>
+		</form>
+		<input type="button" value="Change" />
 	</div>
 
 	<div class="interactive">

@@ -12,7 +12,9 @@ import (
 
 const (
 	// DefaultName is the name of the configuration file on the server
-	DefaultName = ".v2cfg.json"
+	DefaultName    = ".v2cfg.json"
+	ProtocolSACN   = "sacn"
+	ProtocolArtNet = "artnet"
 )
 
 type Layer struct {
@@ -26,6 +28,11 @@ type Display struct {
 	Layers []Layer `json:"layers"`
 }
 
+type Network struct {
+	Name      string
+	IPAddress string
+}
+
 // Config The system configuration
 type Config struct {
 	DebugLevel  int                   `json:"debuglevel"`
@@ -36,6 +43,8 @@ type Config struct {
 	Displays    []Display             `json:"display"`
 	ContentDir  string                `json:"content-directory"`
 	Content     map[int]content.Group `json:"groups"`
+	Networks    []Network             `json:"-"`
+	Protocols   []string              `json:"-"`
 	TemplateDir string                `json:"-"`
 	StaticDir   string                `json:"-"`
 }
