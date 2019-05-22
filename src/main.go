@@ -111,8 +111,14 @@ func main() {
 
 	go DMX.Run()
 	go ws(cfg)
-	
-	gui.GUIInit()
+
+	g, err := gui.GUIInit()
+	if err != nil {
+		log.Error().Err(err).Msg("Could not start GUI")
+		return
+	}
+	g.Run()
+	g.Close()
 }
 
 func ws(cfg *config.Config) {

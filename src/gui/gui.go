@@ -3,24 +3,36 @@ package gui
 import (
 	"fmt"
 	"runtime"
+	"v2/content"
 
-	"github.com/go-gl/gl/v4.1-core/gl"
+	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/rs/zerolog/log"
 )
 
+type layer struct {
+	data []byte
+}
+
 type G struct {
 	win     *glfw.Window
 	refresh bool
+	layers  []layer
 }
 
-func GUIInit() {
-	runtime.LockOSThread()
-	if err := glfw.Init(); err != nil {
-		panic(fmt.Errorf("could not initialize glfw: %v", err))
-	}
+type IMG struct {
+	height int
+	width  int
+	name   string
+	handle uint32
+}
 
-	defer glfw.Terminate()
+func GUIInit() (g *G, err error) {
+	runtime.LockOSThread()
+	if err = glfw.Init(); err != nil {
+		err = fmt.Errorf("could not initialize glfw: %v", err)
+		return
+	}
 
 	monitors := glfw.GetMonitors()
 	for _, m := range monitors {
@@ -34,23 +46,24 @@ func GUIInit() {
 	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
 
-	win, err := glfw.CreateWindow(1920, 1080, "Hello world", nil, nil)
+	win, err := glfw.CreateWindow(1920, 1080, "Display", nil, nil)
 	if err != nil {
-		panic(fmt.Errorf("could not create opengl renderer: %v", err))
+		err = fmt.Errorf("could not create opengl renderer: %v", err)
+		return
 	}
 
 	win.MakeContextCurrent()
-
-	if err := gl.Init(); err != nil {
-		panic(err)
+	if err = gl.Init(); err != nil {
+		return
 	}
 
+	g = &G{win: win, refresh: true, layers: nil}
 	gl.ClearColor(0, 0.1, 0.8, 1.0)
-	g := G{win: win, refresh: true}
-	g.run()
+	return
 }
 
-func (g *G) run() {
+// Run executes the main event loop
+func (g *G) Run() {
 	for !g.win.ShouldClose() {
 		if g.refresh {
 			gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -59,4 +72,60 @@ func (g *G) run() {
 		}
 		glfw.WaitEventsTimeout(0.05)
 	}
+}
+
+func (g *G) Close() {
+	glfw.Terminate()
+}
+
+func (g *G) SetLayerImage(n int, data []byte) {
+	for len(g.layers) <= n {
+		g.layers = append(g.layers, layer{})
+	}
+	g.layers[n].data = data
+}
+
+func (g *G) DrawSlot(slot content.Slot) {
+	filename := slot.GetName()
+	img := getTexture(filename)
+
+	xx := 0
+	yy := 0
+	ww := img.width
+	hh := img.height
+	angle := 0
+
+	gl.Enable(gl.TEXTURE_2D)
+	gl.BindTexture(gl.TEXTURE_2D, img.handle)
+
+	gl.LoadIdentity()
+	gl.Translatef(float32(xx), float32(yy), 0.0)
+	gl.Rotatef(float32(angle), 0.0, 0.0, 1.0)
+	gl.Translatef(-float32(xx), -float32(yy), 0.0)
+
+	// Draw a textured quad
+	gl.Begin(gl.QUADS)
+	gl.TexCoord2f(0, 0)
+	gl.Vertex2f(float32(xx), float32(yy))
+	gl.TexCoord2f(0, 1)
+	gl.Vertex2f(float32(xx), float32(yy+hh))
+	gl.TexCoord2f(1, 1)
+	gl.Vertex2f(float32(xx+ww), float32(yy+hh))
+	gl.TexCoord2f(1, 0)
+	gl.Vertex2f(float32(xx+ww), float32(yy))
+
+	gl.Disable(gl.TEXTURE_2D)
+	gl.PopMatrix()
+
+	gl.MatrixMode(gl.PROJECTION)
+	gl.PopMatrix()
+
+	gl.MatrixMode(gl.MODELVIEW)
+	gl.End()
+
+	// slot.Draw()
+}
+
+func getTexture(fn string) (img IMG) {
+	return
 }
