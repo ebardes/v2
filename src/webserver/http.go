@@ -57,18 +57,19 @@ func Run(config *config.Config) {
 	http.Handle("/media/", &wrap{f: media})
 	http.Handle("/delete/", &wrap{f: remove})
 
-	enumInterfaces()
+	enumInterfaces(config)
 	addr := fmt.Sprintf(":%d", cfg.WebPort)
 	log.Info().Msg("Listening to " + addr)
 	log.Error().Err(http.ListenAndServe(addr, nil)).Msg("Error setting up HTTP server")
 }
 
-func enumInterfaces() (err error) {
+func enumInterfaces(cfg *config.Config) (err error) {
 	ifs, err := net.Interfaces()
 	if err != nil {
 		return
 	}
 
+	cfg.Networks = nil
 	for _, iface := range ifs {
 		addrs, _ := iface.Addrs()
 		if len(addrs) == 0 {
@@ -87,7 +88,14 @@ func enumInterfaces() (err error) {
 					continue // Skip IPv6 addresses
 				}
 
-				log.Info().Str("interface", iface.Name).Str("URL", fmt.Sprintf("http://%s:%d/", ip4, cfg.WebPort)).Msg("Connect")
+				url := fmt.Sprintf("http://%s:%d/", ip4, cfg.WebPort)
+				log.Info().Str("interface", iface.Name).Str("URL", url).Msg("Connect")
+
+				n := config.Network{
+					Name:      iface.Name,
+					IPAddress: ip4.String(),
+				}
+				cfg.Networks = append(cfg.Networks, n)
 			}
 
 		}

@@ -11,6 +11,10 @@ func Index(w http.ResponseWriter, r *http.Request, cfg *config.Config) error {
 }
 
 func Config(w http.ResponseWriter, r *http.Request, cfg *config.Config) error {
+	cfg.Protocols = []string{
+		config.ProtocolSACN,
+		config.ProtocolArtNet,
+	}
 	v := InitView(w).Title("Config")
 	return v.Render("config.tpl", cfg)
 }
