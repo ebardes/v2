@@ -12,6 +12,9 @@ import (
 	"v2/view"
 	"v2/webserver"
 
+	_ "image/jpeg"
+	_ "image/png"
+
 	flags "github.com/jessevdk/go-flags"
 	"github.com/mattn/go-isatty"
 	"github.com/rs/zerolog"

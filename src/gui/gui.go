@@ -126,6 +126,44 @@ func (g *G) DrawSlot(slot content.Slot) {
 	// slot.Draw()
 }
 
-func getTexture(fn string) (img IMG) {
+func getTexture(fn string) (img IMG, err error) {
+	file, err := os.Open(fn)
+	if err != nil {
+		return
+	}
+	data, _, err := image.Decode(file)
+	if err != nil {
+		return
+	}
+
+	rgba := image.NewRGBA(data.Bounds())
+	if rgba.Stride != rgba.Rect.Size().X*4 {
+		panic("unsupported stride")
+	}
+	draw.Draw(rgba, rgba.Bounds(), data, image.Point{0, 0}, draw.Src)
+
+	var texture uint32
+	gl.Enable(gl.TEXTURE_2D)
+	gl.GenTextures(1, &texture)
+	gl.BindTexture(gl.TEXTURE_2D, texture)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
+	gl.TexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+	gl.TexImage2D(
+		gl.TEXTURE_2D,
+		0,
+		gl.RGBA,
+		int32(rgba.Rect.Size().X),
+		int32(rgba.Rect.Size().Y),
+		0,
+		gl.RGBA,
+		gl.UNSIGNED_BYTE,
+		gl.Ptr(rgba.Pix))
+
+	img.width = data.Bounds().Size().X
+	img.height = data.Bounds().Size().Y
+	img.handle = texture
+	img.name = fn
 	return
 }
