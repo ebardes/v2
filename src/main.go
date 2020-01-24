@@ -6,8 +6,8 @@ import (
 	"v2/config"
 	"v2/dmx"
 	"v2/dmx/artnet"
+	"v2/dmx/osc"
 	"v2/dmx/sacn"
-	"v2/gui"
 	"v2/personality"
 	"v2/view"
 	"v2/webserver"
@@ -69,6 +69,9 @@ func main() {
 		if err != nil {
 			log.Error().Err(err).Msg("Error starting DMX listener")
 		}
+
+	case "osc":
+		DMX, err = osc.NewService(cfg)
 	}
 
 	if cfg.Displays == nil || len(cfg.Displays) <= 0 {
@@ -84,23 +87,6 @@ func main() {
 		cfg.Displays = append(cfg.Displays, p)
 	}
 
-	/*
-		if cfg.Content == nil || len(cfg.Content) <= 0 {
-			cfg.Content = map[int]content.Group{
-				1: content.Group{
-					Slots: map[int]content.Slot{
-						1: content.Slot{
-							Name: "Test Pattern",
-							Type: "image",
-							URL:  "static/TestBars.png",
-						},
-					},
-				},
-			}
-		}
-		cfg.Save()
-	*/
-
 	// Construct the runtime layers
 	for _, display := range cfg.Displays {
 		log.Info().Msg(fmt.Sprintf("%v", display))
@@ -113,15 +99,7 @@ func main() {
 	}
 
 	go DMX.Run()
-	go ws(cfg)
-
-	g, err := gui.GUIInit()
-	if err != nil {
-		log.Error().Err(err).Msg("Could not start GUI")
-		return
-	}
-	g.Run()
-	g.Close()
+	ws(cfg)
 }
 
 func ws(cfg *config.Config) {
