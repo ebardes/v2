@@ -73,7 +73,7 @@ function packetFunction(e) {
   
   gl1.drawImage(composite, 0, 0)
 
-  if e.layer == 1 {
+  if (e.layer == 1) {
     console.log(packet)
   }
 

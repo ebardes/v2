@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"net"
 	"sync"
+	"time"
 	"v2/config"
 	"v2/view"
 
@@ -25,6 +26,7 @@ type Common struct {
 	Cfg    *config.Config
 	Layers []DMX2Layer
 	Sync   sync.Mutex
+	last   time.Time
 }
 
 type DMX2Layer struct {
@@ -43,7 +45,10 @@ func (me *Common) OnFrame(addr net.Addr, b []byte) {
 	me.Sync.Lock()
 	defer me.Sync.Unlock()
 
-	if !bytes.Equal(b, me.Frame) {
+	now := time.Now()
+
+	if !bytes.Equal(b, me.Frame) || now.Sub(me.last) > (10*time.Second) {
+		me.last = now
 		if len(me.Frame) != len(b) {
 			me.Frame = make([]byte, len(b))
 		}
@@ -61,7 +66,9 @@ func (me *Common) OnFrame(addr net.Addr, b []byte) {
 
 		if me.Layers != nil {
 			for _, layer := range me.Layers {
-				layer.dl.OnFrame(b[layer.start:])
+				if layer.dl != nil {
+					layer.dl.OnFrame(b[layer.start:])
+				}
 			}
 		}
 	}

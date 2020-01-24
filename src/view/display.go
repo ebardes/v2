@@ -89,11 +89,13 @@ func (me *DisplayLayer) OnFrame(b []byte) {
 		Data: b,
 		Pos:  0,
 	}
-	me.P.Decode(&blob)
-	msg := me.P.DataMessage()
-	msg.Layer = me.layer
-	msg.Display = me.di.Display
-	me.di.Send(msg)
+	if me.P != nil {
+		me.P.Decode(&blob)
+		msg := me.P.DataMessage()
+		msg.Layer = me.layer
+		msg.Display = me.di.Display
+		me.di.Send(msg)
+	}
 }
 
 func FindDisplay(cd *config.Display) (di *DisplayInfo) {

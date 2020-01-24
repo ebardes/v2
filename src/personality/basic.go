@@ -46,9 +46,12 @@ type ExtendedPersonality struct {
 func NewPersonality(personalityName string) (bp Personality) {
 	switch personalityName {
 	default:
+		fallthrough
 	case "basic":
 		bp = &BasicPersonality{}
 
+	case "regular":
+		fallthrough
 	case "medium":
 		bp = &MediumPersonality{}
 
